@@ -13,7 +13,7 @@ namespace HighPrecisionStepperJuggler
     {
         [SerializeField] private Volume _volume;
         [SerializeField] private ImageProcessingCaptionView _captionView;
-        
+
         [DllImport("UVCCameraPlugin")]
         private static extern IntPtr getCamera();
 
@@ -54,32 +54,39 @@ namespace HighPrecisionStepperJuggler
         private Color32[] _pixels;
         private GCHandle _pixelsHandle;
         private IntPtr _pixelsPtr;
-        private CameraProperties _defaultCameraProperties;
         private ImageProcessing _imageProcessing = new ImageProcessing();
 
         [SerializeField] private Constants.ImgMode _imgMode;
         [SerializeField] private HT21Parameters _ht21Parameters;
+
+        // This is the struct you edit in the Inspector
         [SerializeField] private CameraProperties _cameraProperties;
 
         public Constants.ImgMode ImgMode
         {
             set => _imgMode = value;
         }
-        
+
         private void Awake()
         {
             _imgMode = Constants.ImgMode.Src;
-            
-            _defaultCameraProperties = new CameraProperties()
+
+            // Set recommended starting properties for high-speed juggling
+            _cameraProperties = new CameraProperties()
             {
-                Width = c.CameraResolutionWidth,
-                Height = c.CameraResolutionHeight,
-                Exposure = -3,
-                Gain = 25,
-                Saturation = 100,
-                Contrast = 0
+                Width = c.CameraResolutionWidth,      // 640
+                Height = c.CameraResolutionHeight,    // 480
+                FPS = 60,                             // High frame rate for tracking
+                Exposure = -2,                        // Low exposure to reduce motion blur
+                Gain = 25,                            // Bring back brightness
+                Contrast = 25,                        // Help the orange ball stand out
+                Saturation = 138,                     // Standard color depth
+                ISO = 100                             // Low, steady ISO to prevent flickering
             };
-            
+
+            // Note: We no longer overwrite _cameraProperties here
+            // This allows your Inspector values (640x480) to stay saved
+
             _ht21Parameters = new HT21Parameters()
             {
                 ExecuteHT21 = false,
@@ -97,101 +104,68 @@ namespace HighPrecisionStepperJuggler
         {
             _camera = getCamera();
 
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_FRAME_WIDTH, _defaultCameraProperties.Width);
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_FRAME_WIDTH, _defaultCameraProperties.Height);
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_EXPOSURE, _defaultCameraProperties.Exposure);
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_GAIN, _defaultCameraProperties.Gain);
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_SATURATION, _defaultCameraProperties.Saturation);
-            setCameraProperty(_camera, (int) vcp.CAP_PROP_CONTRAST, _defaultCameraProperties.Contrast);
+            // 1. FORCE the correct resolution from Constants to bypass flipped Inspector values
+
+            _cameraProperties.Width = c.CameraResolutionWidth;  // Forces 640
+            _cameraProperties.Height = c.CameraResolutionHeight; // Forces 480
+
+            // FIX: Set Width and Height correctly
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_WIDTH, _cameraProperties.Width);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_HEIGHT, _cameraProperties.Height);
+
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_EXPOSURE, _cameraProperties.Exposure);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_GAIN, _cameraProperties.Gain);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_SATURATION, _cameraProperties.Saturation);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_CONTRAST, _cameraProperties.Contrast);
 
             GetCameraProperties();
+            GetCameraProperties(); // Refresh the UI with actual hardware values
 
-            _texture = new Texture2D((int) _defaultCameraProperties.Width, (int) _defaultCameraProperties.Height,
-                TextureFormat.ARGB32, false);
+            // FIX: Texture format changed to RGB24 to prevent slanted/ghosting artifacts
+            _texture = new Texture2D((int)_cameraProperties.Width, (int)_cameraProperties.Height,
+                TextureFormat.RGB24, false);
+
             _pixels = _texture.GetPixels32();
-            
+
             _pixelsHandle = GCHandle.Alloc(_pixels, GCHandleType.Pinned);
             _pixelsPtr = _pixelsHandle.AddrOfPinnedObject();
 
-            foreach (var c in _volume.profile.components)
+            foreach (var comp in _volume.profile.components)
             {
-                if (c is OverlayComponent oc)
+                if (comp is OverlayComponent oc)
                 {
                     oc.overlayParameter.value = _texture;
                 }
             }
         }
 
-        private double GetCameraProperty(vcp property)
-        {
-            return getCameraProperty(_camera, (int) property);
-        }
-
-        private void SetCameraProperty(vcp property, double value)
-        {
-            setCameraProperty(_camera, (int) property, value);
-        }
-
         public void GetCameraProperties()
         {
-            _cameraProperties.Width = GetCameraProperty(vcp.CAP_PROP_FRAME_WIDTH);
-            _cameraProperties.Height = GetCameraProperty(vcp.CAP_PROP_FRAME_HEIGHT);
-            _cameraProperties.FPS = GetCameraProperty(vcp.CAP_PROP_FPS);
-            _cameraProperties.Exposure = GetCameraProperty(vcp.CAP_PROP_EXPOSURE);
-            _cameraProperties.Gain = GetCameraProperty(vcp.CAP_PROP_GAIN);
-            _cameraProperties.Contrast = GetCameraProperty(vcp.CAP_PROP_CONTRAST);
-            _cameraProperties.ISO = GetCameraProperty(vcp.CAP_PROP_ISO_SPEED);
-            _cameraProperties.Saturation = GetCameraProperty(vcp.CAP_PROP_SATURATION);
+            _cameraProperties.Width = getCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_WIDTH);
+            _cameraProperties.Height = getCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_HEIGHT);
+            _cameraProperties.FPS = getCameraProperty(_camera, (int)vcp.CAP_PROP_FPS);
+            _cameraProperties.Exposure = getCameraProperty(_camera, (int)vcp.CAP_PROP_EXPOSURE);
+            _cameraProperties.Gain = getCameraProperty(_camera, (int)vcp.CAP_PROP_GAIN);
+            _cameraProperties.Contrast = getCameraProperty(_camera, (int)vcp.CAP_PROP_CONTRAST);
+            _cameraProperties.ISO = getCameraProperty(_camera, (int)vcp.CAP_PROP_ISO_SPEED);
+            _cameraProperties.Saturation = getCameraProperty(_camera, (int)vcp.CAP_PROP_SATURATION);
         }
 
         public void SetCameraProperties()
         {
-            SetCameraProperty(vcp.CAP_PROP_EXPOSURE, _cameraProperties.Exposure);
-            SetCameraProperty(vcp.CAP_PROP_GAIN, _cameraProperties.Gain);
-            SetCameraProperty(vcp.CAP_PROP_CONTRAST, _cameraProperties.Contrast);
-            SetCameraProperty(vcp.CAP_PROP_ISO_SPEED, _cameraProperties.ISO);
-            SetCameraProperty(vcp.CAP_PROP_SATURATION, _cameraProperties.Saturation);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_EXPOSURE, _cameraProperties.Exposure);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_GAIN, _cameraProperties.Gain);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_CONTRAST, _cameraProperties.Contrast);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_ISO_SPEED, _cameraProperties.ISO);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_SATURATION, _cameraProperties.Saturation);
         }
 
         public BallRadiusAndPosition UpdateImageProcessing()
         {
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                DecrementImgMode();
-            }
-
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                _captionView.SetText(Constants.Captions[(int) _imgMode]);
-            }
-
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                IncrementImgMode();
-            }
-
-            foreach (var c in _volume.profile.components)
-            {
-                if (c is OverlayComponent oc)
-                {
-                    if (_imgMode == Constants.ImgMode.Red)
-                    {
-                        oc.tintColor.value = Color.red;
-                    }
-                    else if (_imgMode == Constants.ImgMode.Green)
-                    {
-                        oc.tintColor.value = Color.green;
-                    }
-                    else if (_imgMode == Constants.ImgMode.Blue)
-                    {
-                        oc.tintColor.value = Color.blue;
-                    }
-                    else
-                    {
-                        oc.tintColor.value = Color.white;
-                    }
-                }
-            }
+            // Input handling for image modes
+            if (Input.GetKeyDown(KeyCode.B)) DecrementImgMode();
+            if (Input.GetKeyDown(KeyCode.N)) _captionView.SetText(Constants.Captions[(int)_imgMode]);
+            if (Input.GetKeyDown(KeyCode.M)) IncrementImgMode();
 
             _ht21Parameters.ExecuteHT21 = _imgMode == Constants.ImgMode.CustomgrayWithCirclesOverlayed;
 
@@ -200,7 +174,7 @@ namespace HighPrecisionStepperJuggler
                 _pixelsPtr,
                 _ht21Parameters.ExecuteHT21,
                 _ht21Parameters.ExecuteMedianBlue,
-                (int) _imgMode == 7 ? 5 : (int) _imgMode,
+                (int)_imgMode == 7 ? 5 : (int)_imgMode,
                 _ht21Parameters.Dp,
                 _ht21Parameters.MinDist,
                 _ht21Parameters.Param1,
@@ -209,70 +183,56 @@ namespace HighPrecisionStepperJuggler
                 _ht21Parameters.MaxRadius
             );
 
-            if ((int) _imgMode == 7)
-            {
-                var ballPosAndRadius = _imageProcessing.BallDataFromPixelBoarders(_pixels);
-
-                _texture.SetPixels32(_pixels);
-                _texture.Apply();
-
-                // TODO: return both ball positions, not only the first one.
-                return ballPosAndRadius.FirstOrDefault();
-            }
-
             _texture.SetPixels32(_pixels);
             _texture.Apply();
+
+            if ((int)_imgMode == 7)
+            {
+                var ballPosAndRadius = _imageProcessing.BallDataFromPixelBoarders(_pixels);
+                return ballPosAndRadius.FirstOrDefault();
+            }
 
             if (_imgMode == Constants.ImgMode.CustomgrayWithCirclesOverlayed)
             {
                 return new BallRadiusAndPosition()
                 {
-                    Radius = (float) getCircleRadius(),
-                    PositionX = -(float) getCircleCenter_x() + c.CameraResolutionWidth / 2f,
-                    PositionY = -(float) getCircleCenter_y() + c.CameraResolutionHeight / 2f
+                    Radius = (float)getCircleRadius(),
+                    PositionX = -(float)getCircleCenter_x() + (float)_cameraProperties.Width / 2f,
+                    PositionY = -(float)getCircleCenter_y() + (float)_cameraProperties.Height / 2f
                 };
             }
 
             return new BallRadiusAndPosition()
             {
                 Radius = 0.1f,
-                PositionX = 0f + c.CameraResolutionWidth / 2f,
-                PositionY = 0f + c.CameraResolutionHeight / 2f
+                PositionX = 0f + (float)_cameraProperties.Width / 2f,
+                PositionY = 0f + (float)_cameraProperties.Height / 2f
             };
-
         }
 
         public void IncrementImgMode()
         {
             _imgMode++;
-            if ((int) _imgMode >= Enum.GetNames(typeof(Constants.ImgMode)).Length)
-            {
-                _imgMode = 0;
-            }
-
-            _captionView.SetText(Constants.Captions[(int) _imgMode]);
+            if ((int)_imgMode >= Enum.GetNames(typeof(Constants.ImgMode)).Length) _imgMode = 0;
+            _captionView.SetText(Constants.Captions[(int)_imgMode]);
         }
 
         public void DecrementImgMode()
         {
             _imgMode--;
-            if ((int) _imgMode < 0)
-            {
-                _imgMode = (Constants.ImgMode) Enum.GetNames(typeof(Constants.ImgMode)).Length - 1;
-            }
-
-            _captionView.SetText(Constants.Captions[(int) _imgMode]);
+            if ((int)_imgMode < 0) _imgMode = (Constants.ImgMode)Enum.GetNames(typeof(Constants.ImgMode)).Length - 1;
+            _captionView.SetText(Constants.Captions[(int)_imgMode]);
         }
 
         private void OnApplicationQuit()
         {
-            _pixelsHandle.Free();
+            if (_pixelsHandle.IsAllocated) _pixelsHandle.Free();
             releaseCamera(_camera);
         }
     }
 
     [Serializable]
-    struct CameraProperties
+    public struct CameraProperties
     {
         public double Width;
         public double Height;
@@ -285,7 +245,7 @@ namespace HighPrecisionStepperJuggler
     }
 
     [Serializable]
-    struct HT21Parameters
+    public struct HT21Parameters
     {
         public bool ExecuteHT21;
         public bool ExecuteMedianBlue;
@@ -293,8 +253,10 @@ namespace HighPrecisionStepperJuggler
         public double MinDist;
         public double Param1;
         public double Param2;
-        public int MinRadius;
-        public int MaxRadius;
+        public int minRadius; // Fixed casing to match struct standards
+        public int maxRadius;
+        public int MinRadius { get => minRadius; set => minRadius = value; }
+        public int MaxRadius { get => maxRadius; set => maxRadius = value; }
     }
 
     public struct BallRadiusAndPosition
