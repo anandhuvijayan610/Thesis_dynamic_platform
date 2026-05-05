@@ -1,7 +1,6 @@
 /*
   Constants
-  Author: T-Kuhn.
-  Sapporo, October, 2018. Released into the public domain.
+  Author:
   */
 
 #ifndef Constants_h
