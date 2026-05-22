@@ -58,9 +58,7 @@ namespace HighPrecisionStepperJuggler
 
         [SerializeField] private Constants.ImgMode _imgMode;
         [SerializeField] private HT21Parameters _ht21Parameters;
-
-        // This is the struct you edit in the Inspector
-        [SerializeField] private CameraProperties _cameraProperties;
+        [SerializeField] private CameraProperties _cameraProperties;      // This is the struct you edit in the Inspector
 
         public Constants.ImgMode ImgMode
         {
@@ -71,8 +69,7 @@ namespace HighPrecisionStepperJuggler
         {
             _imgMode = Constants.ImgMode.Src;
 
-            // Set recommended starting properties for high-speed juggling
-            _cameraProperties = new CameraProperties()
+            _cameraProperties = new CameraProperties()           // Set recommended starting properties for high-speed juggling
             {
                 Width = c.CameraResolutionWidth,      // 640
                 Height = c.CameraResolutionHeight,    // 480
@@ -118,7 +115,6 @@ namespace HighPrecisionStepperJuggler
             setCameraProperty(_camera, (int)vcp.CAP_PROP_SATURATION, _cameraProperties.Saturation);
             setCameraProperty(_camera, (int)vcp.CAP_PROP_CONTRAST, _cameraProperties.Contrast);
 
-            GetCameraProperties();
             GetCameraProperties(); // Refresh the UI with actual hardware values
 
             // FIX: Texture format changed to RGB24 to prevent slanted/ghosting artifacts
@@ -137,6 +133,16 @@ namespace HighPrecisionStepperJuggler
                     oc.overlayParameter.value = _texture;
                 }
             }
+        }
+
+        private double GetCameraProperty(vcp property)
+        {
+            return getCameraProperty(_camera, (int) property);
+        }
+
+        private void SetCameraProperty(vcp property, double value)
+        {
+            setCameraProperty(_camera, (int) property, value);
         }
 
         public void GetCameraProperties()
@@ -163,9 +169,43 @@ namespace HighPrecisionStepperJuggler
         public BallRadiusAndPosition UpdateImageProcessing()
         {
             // Input handling for image modes
-            if (Input.GetKeyDown(KeyCode.B)) DecrementImgMode();
-            if (Input.GetKeyDown(KeyCode.N)) _captionView.SetText(Constants.Captions[(int)_imgMode]);
-            if (Input.GetKeyDown(KeyCode.M)) IncrementImgMode();
+            if (Input.GetKeyDown(KeyCode.B)) 
+            {
+                DecrementImgMode();
+            }
+
+            if (Input.GetKeyDown(KeyCode.N)) 
+            {
+                _captionView.SetText(Constants.Captions[(int)_imgMode]);
+            }
+
+            if (Input.GetKeyDown(KeyCode.M)) 
+            {
+                IncrementImgMode();
+            }
+
+             foreach (var c in _volume.profile.components)
+            {
+                if (c is OverlayComponent oc)
+                {
+                    if (_imgMode == Constants.ImgMode.Red)
+                    {
+                        oc.tintColor.value = Color.red;
+                    }
+                    else if (_imgMode == Constants.ImgMode.Green)
+                    {
+                        oc.tintColor.value = Color.green;
+                    }
+                    else if (_imgMode == Constants.ImgMode.Blue)
+                    {
+                        oc.tintColor.value = Color.blue;
+                    }
+                    else
+                    {
+                        oc.tintColor.value = Color.white;
+                    }
+                }
+            }
 
             _ht21Parameters.ExecuteHT21 = _imgMode == Constants.ImgMode.CustomgrayWithCirclesOverlayed;
 
@@ -183,14 +223,19 @@ namespace HighPrecisionStepperJuggler
                 _ht21Parameters.MaxRadius
             );
 
-            _texture.SetPixels32(_pixels);
-            _texture.Apply();
-
-            if ((int)_imgMode == 7)
+             if ((int) _imgMode == 7)
             {
                 var ballPosAndRadius = _imageProcessing.BallDataFromPixelBoarders(_pixels);
+
+                _texture.SetPixels32(_pixels);
+                _texture.Apply();
+
+                // TODO: return both ball positions, not only the first one.
                 return ballPosAndRadius.FirstOrDefault();
             }
+
+            _texture.SetPixels32(_pixels);
+            _texture.Apply();
 
             if (_imgMode == Constants.ImgMode.CustomgrayWithCirclesOverlayed)
             {
@@ -213,14 +258,22 @@ namespace HighPrecisionStepperJuggler
         public void IncrementImgMode()
         {
             _imgMode++;
-            if ((int)_imgMode >= Enum.GetNames(typeof(Constants.ImgMode)).Length) _imgMode = 0;
+            if ((int)_imgMode >= Enum.GetNames(typeof(Constants.ImgMode)).Length) 
+            {
+                _imgMode = 0;
+            }
+
             _captionView.SetText(Constants.Captions[(int)_imgMode]);
         }
 
         public void DecrementImgMode()
         {
             _imgMode--;
-            if ((int)_imgMode < 0) _imgMode = (Constants.ImgMode)Enum.GetNames(typeof(Constants.ImgMode)).Length - 1;
+            if ((int)_imgMode < 0) 
+            {
+                _imgMode = (Constants.ImgMode)Enum.GetNames(typeof(Constants.ImgMode)).Length - 1;
+            }
+            
             _captionView.SetText(Constants.Captions[(int)_imgMode]);
         }
 
