@@ -1,6 +1,6 @@
 // Define Pins for 4 Drivers
 const int stepPins[] = {2, 4, 6, 8};
-const int dirPins[]  = {3, 5, 7, 9};
+const int dirPins[]  = {9, 3, 5, 7};
 
 void setup() {
   // Initialize all pins as outputs
@@ -31,9 +31,9 @@ void loop() {
 void runMotors(int steps) {
   for (int i = 0; i < steps; i++) {
     for (int p = 0; p < 4; p++) digitalWrite(stepPins[p], HIGH);
-    delayMicroseconds(400); // Speed control (lower = faster)
+    delayMicroseconds(50); // Speed control (lower = faster)
     for (int p = 0; p < 4; p++) digitalWrite(stepPins[p], LOW);
-    delayMicroseconds(400);
+    delayMicroseconds(50);
   }
 }
 

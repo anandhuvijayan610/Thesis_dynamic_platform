@@ -188,6 +188,7 @@ namespace HighPrecisionStepperJuggler
             }
 
             var ballRadiusAndPosition = _cameraPlugin.UpdateImageProcessing();
+            Debug.Log($"Ball r, x, y :{ballRadiusAndPosition.Radius}, {ballRadiusAndPosition.PositionX}, {ballRadiusAndPosition.PositionY}");
             var height = FOVCalculations.RadiusToDistance(ballRadiusAndPosition.Radius);
 
             if (!_isExecuteControlStrategies.Value)

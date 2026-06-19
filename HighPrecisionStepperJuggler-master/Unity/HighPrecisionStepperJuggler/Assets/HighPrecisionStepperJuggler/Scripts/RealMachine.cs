@@ -25,6 +25,8 @@ namespace HighPrecisionStepperJuggler
             builder.Append('\n');
 
             _serial.Send(builder.ToString());
+            
+            //debug.Log($"Sent to serial: {builder.ToString()}"); //debug for seeing what is being sent to the serial interface
         }
 
         public override void GoToOrigin()
