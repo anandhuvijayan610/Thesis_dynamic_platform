@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace HighPrecisionStepperJuggler
             {
                 if (i >= 2) builder.Append(":");
 
-                builder.Append((11f * i++).ToString("0.00000"));
+                builder.Append((11f * i++).ToString("0.00000", CultureInfo.InvariantCulture));
                 builder.Append(":");
                 builder.Append(diffInstruction.Serialize());
             }
@@ -27,6 +28,23 @@ namespace HighPrecisionStepperJuggler
             _serial.Send(builder.ToString());
             
             //debug.Log($"Sent to serial: {builder.ToString()}"); //debug for seeing what is being sent to the serial interface
+        }
+
+        private void Update()
+        {
+            // Runtime test: press T to send a visible single-motor move for debugging
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                if (_serial != null)
+                {
+                    Debug.Log("[RealMachine] Sending test move (motor0, small rotation, 2s)");
+                    _serial.SendTestMove(0, 0.1f, 2f);
+                }
+                else
+                {
+                    Debug.LogWarning("_serial is null");
+                }
+            }
         }
 
         public override void GoToOrigin()

@@ -78,8 +78,9 @@ void loop()
         else
         {
             // We have received a LF or CR character
-            //Serial.print("RECEIVED MSG: ");
-            //Serial.println(inputBuffer);
+            // Debug: echo the raw received message
+            Serial.print("RECEIVED MSG: ");
+            Serial.println(inputBuffer);
 
             inputBuffer[s_len] = 0;
 
@@ -101,18 +102,43 @@ void loop()
                 index++;
             }
 
+            // Debug: print parsed tokens
+            Serial.print("Parsed tokens (count=");
+            Serial.print(index);
+            Serial.print("): ");
+            for (int t = 0; t < index; t++)
+            {
+                Serial.print(instructionData[t], 5);
+                if (t < index - 1) Serial.print(" |");
+            }
+            Serial.println();
+
             int numOfMoveBatches = index / 6;
+            Serial.print("Num of move batches: ");
+            Serial.println(numOfMoveBatches);
             for (int i = 0; i < numOfMoveBatches; i++)
             {
                 int offset = i * 6;
                 MoveBatch *mb = &sineStepperController.moveBatches[i];
+                // Debug: show marker check
+                Serial.print("Batch "); Serial.print(i); Serial.print(" marker value: "); Serial.println(instructionData[offset], 5);
                 if (instructionData[offset] > ((i + 1) * 11.0) - 0.1 && instructionData[offset] < ((i + 1) * 11) + 0.1)
                 {
+                    Serial.println("Marker matches expected value.");
                     mb->addMove(/*id:*/ 0, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 1] / (M_PI * 2))));
+                    Serial.print("Motor0 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 1] / (M_PI * 2))));
                     mb->addMove(/*id:*/ 1, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 2] / (M_PI * 2))));
+                    Serial.print("Motor1 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 2] / (M_PI * 2))));
                     mb->addMove(/*id:*/ 2, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2))));
+                    Serial.print("Motor2 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2))));
                     mb->addMove(/*id:*/ 3, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
+                    Serial.print("Motor3 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
                     mb->moveDuration = instructionData[offset + 5];
+                    Serial.print("Move duration: "); Serial.println(mb->moveDuration, 5);
+                }
+                else
+                {
+                    Serial.println("Marker did NOT match expected value - skipping batch.");
                 }
             }
 

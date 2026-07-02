@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using UnityEngine;
 using ik = HighPrecisionStepperJuggler.InverseKinematics;
 
@@ -68,15 +69,15 @@ namespace HighPrecisionStepperJuggler
         {
             var builder = new StringBuilder();
 
-            builder.Append((llInstruction.TargetMachineState.Motor1Rotation).ToString("0.00000"));
+            builder.Append((llInstruction.TargetMachineState.Motor1Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
             builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor2Rotation).ToString("0.00000"));
+            builder.Append((llInstruction.TargetMachineState.Motor2Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
             builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor3Rotation).ToString("0.00000"));
+            builder.Append((llInstruction.TargetMachineState.Motor3Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
             builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor4Rotation).ToString("0.00000"));
+            builder.Append((llInstruction.TargetMachineState.Motor4Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
             builder.Append(":");
-            builder.Append(llInstruction.MoveTime.ToString("0.00000"));
+            builder.Append(llInstruction.MoveTime.ToString("0.00000", CultureInfo.InvariantCulture));
 
             return builder.ToString();
         }
