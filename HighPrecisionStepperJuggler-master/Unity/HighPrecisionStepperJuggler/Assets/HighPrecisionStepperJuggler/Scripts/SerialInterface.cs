@@ -11,7 +11,19 @@ namespace HighPrecisionStepperJuggler
         
         private SerialPort _port;
         Thread _receiveDataThread;
-        private bool _isOpen => _port != null && _port.IsOpen;
+        private bool _shouldExit = false;
+        private readonly object _portLock = new object(); // Thread safety lock
+        
+        private bool _isOpen
+        {
+            get
+            {
+                lock (_portLock)
+                {
+                    return _port != null && _port.IsOpen;
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -27,20 +39,24 @@ namespace HighPrecisionStepperJuggler
                 return;
             }
 
-            try
+            lock (_portLock)
             {
-                _port = new SerialPort(_portName, Constants.BaudRate, Parity.None, 8, StopBits.One);
-                _port.ReadTimeout = 500; // MUST have a timeout to prevent thread locking
-                _port.WriteTimeout = 500;
-                _port.Open();
+                try
+                {
+                    _port = new SerialPort(_portName, Constants.BaudRate, Parity.None, 8, StopBits.One);
+                    _port.ReadTimeout = 500; // MUST have a timeout to prevent thread locking
+                    _port.WriteTimeout = 500;
+                    _port.Open();
 
-                _receiveDataThread = new Thread(RecieveData);
-                _receiveDataThread.IsBackground = true; // Makes the thread close when Unity closes
-                _receiveDataThread.Start();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError("Could not open serial port: " + e.Message);
+                    _shouldExit = false;
+                    _receiveDataThread = new Thread(RecieveData);
+                    _receiveDataThread.IsBackground = true; // Makes the thread close when Unity closes
+                    _receiveDataThread.Start();
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Could not open serial port: " + e.Message);
+                }
             }
         }
 
@@ -48,27 +64,66 @@ namespace HighPrecisionStepperJuggler
         {
             if (!_isOpen) Open();
             
-            _port.Write(s);
+            lock (_portLock)
+            {
+                try
+                {
+                    if (_port != null && _port.IsOpen)
+                    {
+                        _port.Write(s);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Error sending data: " + e.Message);
+                }
+            }
         }
         
         private void RecieveData()
         {
-            while (_port.IsOpen)
+            while (!_shouldExit)
             {
-                var str = _port.ReadLine();
+                try
+                {
+                    lock (_portLock)
+                    {
+                        if (_port != null && _port.IsOpen)
+                        {
+                            var str = _port.ReadLine();
+                            // TODO: Process received data here if needed
+                        }
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    // Timeout is expected when no data is available - just continue
+                    continue;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Error receiving data: " + e.Message);
+                    break;
+                }
             }
         }
 
         private void OnDestroy()
         {
-            if (_port != null && _port.IsOpen)
+            _shouldExit = true;
+            
+            lock (_portLock)
             {
-                _port.Close();
+                if (_port != null && _port.IsOpen)
+                {
+                    _port.Close();
+                    _port.Dispose();
+                }
             }
 
             if (_receiveDataThread != null && _receiveDataThread.IsAlive)
             {
-                _receiveDataThread.Abort();
+                _receiveDataThread.Join(1000); // Wait up to 1 second for thread to finish
             }
         }
     }

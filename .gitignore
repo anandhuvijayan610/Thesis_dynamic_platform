@@ -64,3 +64,4 @@ crashlytics-build.properties
 # Logs folders
 DMPLogsUnity
 my_documents
+my_documents_*
