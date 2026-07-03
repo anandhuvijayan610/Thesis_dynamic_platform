@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.IO.Ports;
+using System.Text;
 
 namespace HighPrecisionStepperJuggler
 {
@@ -11,6 +12,10 @@ namespace HighPrecisionStepperJuggler
 
         private SerialPort _port;
         private readonly object _portLock = new object();
+        private readonly StringBuilder _receiveBuffer = new StringBuilder();
+        private string _lastReceivedMessage = string.Empty;
+
+        public string LastReceivedMessage => _lastReceivedMessage;
 
         private bool _isOpen
         {
@@ -29,6 +34,55 @@ namespace HighPrecisionStepperJuggler
             // Log available ports and the configured port name for debugging
             Debug.Log("[SerialInterface] Available ports: " + string.Join(", ", _availablePorts));
             Debug.Log("[SerialInterface] Configured port name: " + (_portName == "" ? "(empty)" : _portName));
+        }
+
+        private void Update()
+        {
+            if (!_isOpen)
+            {
+                return;
+            }
+
+            lock (_portLock)
+            {
+                try
+                {
+                    if (_port != null && _port.IsOpen && _port.BytesToRead > 0)
+                    {
+                        var incoming = _port.ReadExisting();
+                        if (!string.IsNullOrEmpty(incoming))
+                        {
+                            _receiveBuffer.Append(incoming);
+                            ProcessReceiveBuffer();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("[SerialInterface] Error reading serial: " + e.Message);
+                }
+            }
+        }
+
+        private void ProcessReceiveBuffer()
+        {
+            var buffer = _receiveBuffer.ToString();
+            int newlineIndex;
+
+            while ((newlineIndex = buffer.IndexOf('\n')) >= 0)
+            {
+                var line = buffer.Substring(0, newlineIndex).Trim('\r');
+                if (!string.IsNullOrEmpty(line))
+                {
+                    _lastReceivedMessage = line;
+                    Debug.Log("[SerialInterface] Received: " + line);
+                }
+
+                buffer = buffer.Substring(newlineIndex + 1);
+            }
+
+            _receiveBuffer.Clear();
+            _receiveBuffer.Append(buffer);
         }
 
         // Context menu helper to probe all detected COM ports and try opening them briefly.
@@ -125,6 +179,11 @@ namespace HighPrecisionStepperJuggler
                     Close();
                 }
             }
+        }
+
+        public void SendPing()
+        {
+            Send("PING\n");
         }
 
         // Helper: send a simple test move to the Arduino (useful from Inspector)

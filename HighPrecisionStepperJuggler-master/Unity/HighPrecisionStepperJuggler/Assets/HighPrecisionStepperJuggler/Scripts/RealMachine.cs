@@ -32,18 +32,23 @@ namespace HighPrecisionStepperJuggler
 
         private void Update()
         {
+            if (_serial == null)
+            {
+                return;
+            }
+
             // Runtime test: press T to send a visible single-motor move for debugging
             if (Input.GetKeyDown(KeyCode.T))
             {
-                if (_serial != null)
-                {
-                    Debug.Log("[RealMachine] Sending test move (motor0, small rotation, 2s)");
-                    _serial.SendTestMove(0, 0.1f, 2f);
-                }
-                else
-                {
-                    Debug.LogWarning("_serial is null");
-                }
+                Debug.Log("[RealMachine] Sending test move (motor0, small rotation, 2s)");
+                _serial.SendTestMove(0, 0.1f, 2f);
+            }
+
+            // Runtime test: press Y to send a ping and receive a response from the Teensy
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                Debug.Log("[RealMachine] Sending ping to Teensy");
+                _serial.SendPing();
             }
         }
 
