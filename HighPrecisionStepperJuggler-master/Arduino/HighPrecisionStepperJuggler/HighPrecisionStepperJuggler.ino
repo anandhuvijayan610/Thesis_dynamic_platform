@@ -133,7 +133,13 @@ void loop()
                     Serial.print("Motor2 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2))));
                     mb->addMove(/*id:*/ 3, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
                     Serial.print("Motor3 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
-                    mb->moveDuration = instructionData[offset + 5];
+
+                    float requestedMoveDuration = instructionData[offset + 5];
+                    if (requestedMoveDuration < MOVE_DURATION)
+                    {
+                        requestedMoveDuration = MOVE_DURATION;
+                    }
+                    mb->moveDuration = requestedMoveDuration;
                     Serial.print("Move duration: "); Serial.println(mb->moveDuration, 5);
                 }
                 else
