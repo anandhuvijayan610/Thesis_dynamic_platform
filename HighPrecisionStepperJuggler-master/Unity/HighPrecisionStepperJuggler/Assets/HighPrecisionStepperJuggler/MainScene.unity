@@ -875,11 +875,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1395260053}
     m_Modifications:
-    - target: {fileID: 4479322176669253146, guid: 93ad51e6f85578a4aa3c4ace4286c613,
-        type: 3}
-      propertyPath: m_Name
-      value: Model Machine
-      objectReference: {fileID: 0}
     - target: {fileID: 4479322176669253145, guid: 93ad51e6f85578a4aa3c4ace4286c613,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -934,6 +929,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4479322176669253146, guid: 93ad51e6f85578a4aa3c4ace4286c613,
+        type: 3}
+      propertyPath: m_Name
+      value: Model Machine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93ad51e6f85578a4aa3c4ace4286c613, type: 3}
@@ -5414,8 +5414,8 @@ MonoBehaviour:
     MinDist: 120
     Param1: 60
     Param2: 30
-    MinRadius: 20
-    MaxRadius: 110
+    minRadius: 0
+    maxRadius: 0
   _cameraProperties:
     Width: 0
     Height: 0
@@ -8100,7 +8100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _realMachine: {fileID: 165232599}
   _modelMachine: {fileID: 333164413}
-  _machineEndPoint: 0
+  _machineEndPoint: 2
 --- !u!4 &1395260053
 Transform:
   m_ObjectHideFlags: 0

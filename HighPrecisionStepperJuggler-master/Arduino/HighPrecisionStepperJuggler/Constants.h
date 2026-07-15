@@ -37,15 +37,19 @@
 #define PULSES_PER_REV 16576 // 200 * 16 * 5.18 (gear ratio 5.18:1)
 //#define MOVE_DURATION 1.0f
 //#define PAUSE_DURATION 0.2f
-#define MOVE_DURATION 2.0f
+// MOVE_DURATION is the minimum allowed move duration (sanity floor for incoming
+// instructions). Unity sends 0.1s moves during balancing, so this must stay below that.
+#define MOVE_DURATION 0.05f
 #define PAUSE_DURATION 0.5f
 
 //#define FREQUENCY_MULTIPLIER 0.000002f
-//#define TIMER_US 2  
+//#define TIMER_US 2
 // A 2 us interrupt was too aggressive for the sine-stepper ISR on the Teensy and could cause missed pulses.
-// 100 us gives more headroom and reduces the chance of stalling from too-fast pulse generation.
+// FREQUENCY_MULTIPLIER must equal TIMER_US expressed in seconds, otherwise moves take
+// longer than the requested moveDuration. 10 us gives 5x more ISR headroom than 2 us
+// while still allowing peak step rates of ~25k steps/s (one toggle per 2 ticks).
 #define FREQUENCY_MULTIPLIER 0.00001f
-#define TIMER_US 100
+#define TIMER_US 10
 
 // NOTE: SineStepper and MoveBatch ids must be lower then MAX_NUM_OF_STEPPERS
 #define MAX_NUM_OF_STEPPERS 10

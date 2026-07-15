@@ -44,6 +44,22 @@ void SineStepperController::attach(SineStepper *sStepper)
 void SineStepperController::resetMoveBatchExecution()
 {
     _currentMoveBatchIndex = 0;
+    // Abort any in-flight move so the freshly written batch 0 is loaded on the
+    // next ISR tick. currentPos tracks actually emitted pulses, so the next
+    // setGoalPos() still computes the correct remaining steps.
+    _isExecutingBatch = false;
+    _counter = 0;
+}
+
+// - - - - - - - - - - - - - - - -
+// - - CLEAR ALL MOVEBATCHES - - -
+// - - - - - - - - - - - - - - - -
+void SineStepperController::clearAllMoveBatches()
+{
+    for (uint32_t i = 0; i < MAX_NUM_OF_MOVEBATCHES; i++)
+    {
+        moveBatches[i].needsExecution = false;
+    }
 }
 
 // - - - - - - - - - - - - - - -

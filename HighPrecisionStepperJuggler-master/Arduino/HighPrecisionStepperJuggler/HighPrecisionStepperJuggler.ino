@@ -16,7 +16,7 @@ enum Mode
     error
 };
 
-Mode currentMode = idle;
+volatile Mode currentMode = idle;
 char inputBuffer[INPUT_SIZE + 1];
 
 SineStepper sineStepper1(STEPPER1_STEP_PIN, STEPPER1_DIR_PIN, /*id:*/ 0);
@@ -85,6 +85,9 @@ void loop()
             inputBuffer[s_len] = 0;
 
             currentMode = idle;
+            // Discard batches left over from the previous command so they can't
+            // execute stale positions after the new ones finish.
+            sineStepperController.clearAllMoveBatches();
             int index = 0;
             double instructionData[MAX_NUM_OF_MOVEBATCHES * 6];
             for (int i = 0; i < MAX_NUM_OF_MOVEBATCHES * 6; i++)
@@ -114,14 +117,18 @@ void loop()
             Serial.println();
 
             int numOfMoveBatches = index / 6;
+
             Serial.print("Num of move batches: ");
             Serial.println(numOfMoveBatches);
+
             for (int i = 0; i < numOfMoveBatches; i++)
             {
                 int offset = i * 6;
                 MoveBatch *mb = &sineStepperController.moveBatches[i];
+                
                 // Debug: show marker check
                 Serial.print("Batch "); Serial.print(i); Serial.print(" marker value: "); Serial.println(instructionData[offset], 5);
+
                 if (instructionData[offset] > ((i + 1) * 11.0) - 0.1 && instructionData[offset] < ((i + 1) * 11) + 0.1)
                 {
                     Serial.println("Marker matches expected value.");

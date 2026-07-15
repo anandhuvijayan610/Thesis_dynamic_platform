@@ -19,6 +19,7 @@ public:
   void update();
   void attach(SineStepper *sStepper);
   void resetMoveBatchExecution();
+  void clearAllMoveBatches();
   MoveBatch moveBatches[MAX_NUM_OF_MOVEBATCHES];
 
 private:
