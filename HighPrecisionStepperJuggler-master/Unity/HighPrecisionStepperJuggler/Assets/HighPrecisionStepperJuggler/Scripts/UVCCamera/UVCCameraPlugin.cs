@@ -74,10 +74,10 @@ namespace HighPrecisionStepperJuggler
                 Width = c.CameraResolutionWidth,      // 640
                 Height = c.CameraResolutionHeight,    // 480
                 FPS = 60,                             // High frame rate for tracking
-                Exposure = -2,                        // Low exposure to reduce motion blur
-                Gain = 25,                            // Bring back brightness
+                Exposure = -5,                        // Low exposure to reduce motion blur
+                Gain = 15,                            // Bring back brightness
                 Contrast = 25,                        // Help the orange ball stand out
-                Saturation = 138,                     // Standard color depth
+                Saturation = 160,                     // Standard color depth
                 ISO = 100                             // Low, steady ISO to prevent flickering
             };
 
