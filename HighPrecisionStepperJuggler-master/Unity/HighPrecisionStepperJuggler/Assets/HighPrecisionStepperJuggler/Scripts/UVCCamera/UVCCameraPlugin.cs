@@ -87,13 +87,13 @@ namespace HighPrecisionStepperJuggler
             _ht21Parameters = new HT21Parameters()
             {
                 ExecuteHT21 = false,
-                ExecuteMedianBlue = false,
+                ExecuteMedianBlue = true,  // Smooths noise, which matters more now that small/distant detections (~30px) are in play
                 Dp = 1,
                 MinDist = 120,
                 Param1 = 60,
-                Param2 = 42,       // Between original 35 and 50: fewer false circles while reducing miss-frame flicker on a stationary ball
-                MinRadius = 12,
-                MaxRadius = 160
+                Param2 = 32,       // Lowered from 42: high threshold was tuned against near-plate (~117px) circles and likely rejects genuine small (~30-40px) detections near the 200mm apex
+                MinRadius = 28,    // Covers ~200mm height (radius ~34px) with margin, using calibrated FOV=77.9deg/BallHeightAtOrigin=78.8mm
+                MaxRadius = 140    // Covers near-plate contact (radius ~117px) with margin, tightened from 160
             };
         }
 
@@ -109,6 +109,21 @@ namespace HighPrecisionStepperJuggler
             // FIX: Set Width and Height correctly
             setCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_WIDTH, _cameraProperties.Width);
             setCameraProperty(_camera, (int)vcp.CAP_PROP_FRAME_HEIGHT, _cameraProperties.Height);
+
+            // Disable auto-exposure/auto-focus/auto-white-balance first, so the camera doesn't keep
+            // re-adjusting these frame-to-frame and fighting the manual values set below.
+            // Confirmed via readback on this camera's driver: 0 = manual, 1 = auto (not the V4L2
+            // 0.25/0.75 convention).
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_AUTO_EXPOSURE, 0);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_AUTOFOCUS, 0);
+            setCameraProperty(_camera, (int)vcp.CAP_PROP_AUTO_WB, 0);
+
+            // Diagnostic: confirms whether the driver actually accepted the values above.
+            // If AutoExposure doesn't read back as 0, this backend/driver isn't honoring
+            // that property and a different value (or backend) is needed.
+            Debug.Log($"[Camera] AutoExposure={getCameraProperty(_camera, (int)vcp.CAP_PROP_AUTO_EXPOSURE)}, " +
+                      $"AutoFocus={getCameraProperty(_camera, (int)vcp.CAP_PROP_AUTOFOCUS)}, " +
+                      $"AutoWB={getCameraProperty(_camera, (int)vcp.CAP_PROP_AUTO_WB)}");
 
             setCameraProperty(_camera, (int)vcp.CAP_PROP_EXPOSURE, _cameraProperties.Exposure);
             setCameraProperty(_camera, (int)vcp.CAP_PROP_GAIN, _cameraProperties.Gain);

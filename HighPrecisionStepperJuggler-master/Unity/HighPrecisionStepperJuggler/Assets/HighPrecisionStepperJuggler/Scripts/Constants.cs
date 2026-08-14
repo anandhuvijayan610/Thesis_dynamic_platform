@@ -16,12 +16,12 @@ namespace HighPrecisionStepperJuggler
         public const float L1 = 0.089f;
         public const float L2 = 0.080f;
 
-        public static float BallHeightAtOrigin = 78f;
+        public static float BallHeightAtOrigin = 78.8f;
 
         public const float HeightOrigin = 0.0566f;
         public const int BaudRate = 921600;
 
-        public static float CameraFOVInDegrees = 61.6f;
+        public static float CameraFOVInDegrees = 77.9f;
         public static float RadiusOfPingPongBall = 20.0f;
 
         public static int CameraResolutionWidth = 640;
