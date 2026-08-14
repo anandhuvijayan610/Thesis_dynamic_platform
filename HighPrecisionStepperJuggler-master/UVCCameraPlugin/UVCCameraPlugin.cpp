@@ -71,13 +71,13 @@ void getCameraTexture(
     }
     gray = r - b;
 
+    if (executeMedianBlur)
+    {
+        medianBlur(gray, gray, 5);
+    }
+
     if (executeHT21)
     {
-        if (executeMedianBlur)
-        {
-            medianBlur(gray, gray, 5);
-        }
-
         vector<Vec3f> circles;
         HoughCircles(
             gray,             // inputArray
