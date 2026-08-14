@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using HighPrecisionStepperJuggler.MachineLearning;
 using UniRx;
 using UnityEngine;
@@ -41,6 +42,7 @@ namespace HighPrecisionStepperJuggler
 
         private BallData _ballData;
         private int _currentStrategyIndex;
+        private bool _isBallPositionLoggingEnabled;
 
         private ReactiveProperty<bool> _isExecuteControlStrategies = new ReactiveProperty<bool>();
         public IObservable<bool> OnExecutingControlStrategies => _isExecuteControlStrategies;
@@ -187,9 +189,36 @@ namespace HighPrecisionStepperJuggler
                 _isExecuteControlStrategies.Value = !_isExecuteControlStrategies.Value;
             }
 
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                _isBallPositionLoggingEnabled = !_isBallPositionLoggingEnabled;
+                Debug.Log($"Ball position logging {(_isBallPositionLoggingEnabled ? "enabled" : "disabled")}");
+            }
+
             var ballRadiusAndPosition = _cameraPlugin.UpdateImageProcessing();
-            Debug.Log($"Ball r, x, y :{ballRadiusAndPosition.Radius}, {ballRadiusAndPosition.PositionX}, {ballRadiusAndPosition.PositionY}");
+
+            if (_isBallPositionLoggingEnabled)
+            {
+                Debug.Log($"Ball r, x, y :{ballRadiusAndPosition.Radius}, {ballRadiusAndPosition.PositionX}, {ballRadiusAndPosition.PositionY}");
+            }
+
             var height = FOVCalculations.RadiusToDistance(ballRadiusAndPosition.Radius);
+
+            if (height < float.MaxValue)
+            {
+                if (Input.GetKeyDown(KeyCode.I))
+                {
+                    LogBallCalibrationSample("origin", ballRadiusAndPosition, height);
+                }
+                else if (Input.GetKeyDown(KeyCode.X))
+                {
+                    LogBallCalibrationSample("max_distance", ballRadiusAndPosition, height);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.X))
+            {
+                Debug.LogWarning("Cannot log calibration sample: ball not detected in current frame.");
+            }
 
             if (!_isExecuteControlStrategies.Value)
             {
@@ -256,6 +285,27 @@ namespace HighPrecisionStepperJuggler
                     }
                 }
             }
+        }
+
+        // Ball radius/position calibration log, written to <repo root>/log files/ball_calibration_log.csv
+        private static string GetCalibrationLogPath()
+        {
+            return Path.Combine(Application.dataPath, "..", "..", "..", "..", "log files", "ball_calibration_log.csv");
+        }
+
+        private static void LogBallCalibrationSample(string label, BallRadiusAndPosition ball, float distanceMm)
+        {
+            var path = GetCalibrationLogPath();
+
+            if (!File.Exists(path))
+            {
+                File.WriteAllText(path, "Timestamp,Label,PixelRadius,PixelX,PixelY,DistanceMm\n");
+            }
+
+            var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss},{label},{ball.Radius},{ball.PositionX},{ball.PositionY},{distanceMm}\n";
+            File.AppendAllText(path, line);
+
+            Debug.Log($"Logged '{label}' calibration sample: radius={ball.Radius}px, x={ball.PositionX}px, y={ball.PositionY}px, distance={distanceMm}mm");
         }
     }
 }

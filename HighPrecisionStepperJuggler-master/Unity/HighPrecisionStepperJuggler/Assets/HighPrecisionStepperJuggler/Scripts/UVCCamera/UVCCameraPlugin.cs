@@ -91,7 +91,7 @@ namespace HighPrecisionStepperJuggler
                 Dp = 1,
                 MinDist = 120,
                 Param1 = 60,
-                Param2 = 35,
+                Param2 = 42,       // Between original 35 and 50: fewer false circles while reducing miss-frame flicker on a stationary ball
                 MinRadius = 12,
                 MaxRadius = 160
             };
