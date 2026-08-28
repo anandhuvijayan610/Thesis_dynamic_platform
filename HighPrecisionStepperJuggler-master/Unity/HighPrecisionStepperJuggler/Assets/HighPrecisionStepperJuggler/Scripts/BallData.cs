@@ -45,9 +45,13 @@ namespace HighPrecisionStepperJuggler
         // NOTE: the units are [mm/s] 
         public float CalculatedOnBounceDownwardsVelocity => (AirborneTime * 9.81f) / 2f * 1000f;
 
+        // Visualisation only: turns the height-above-origin back into a camera-relative
+        // distance, so it has to use the same reference plane RadiusToDistance measured
+        // against - the plate at the WORKING origin, not the mechanical dead position.
         public Vector3 CurrentUnityPositionVector => new Vector3(
                                                          _currentPositionVector.x,
-                                                         _currentPositionVector.z + Constants.BallHeightAtOrigin,
+                                                         _currentPositionVector.z +
+                                                         FOVCalculations.CameraToPlateDistanceAtOrigin,
                                                          _currentPositionVector.y) / 1000f;
 
         private Vector3 _currentPositionVector = Vector3.zero;

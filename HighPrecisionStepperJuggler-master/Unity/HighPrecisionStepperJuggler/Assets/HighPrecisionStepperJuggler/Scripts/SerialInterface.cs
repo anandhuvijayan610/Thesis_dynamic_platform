@@ -10,6 +10,12 @@ namespace HighPrecisionStepperJuggler
         [SerializeField] private string[] _availablePorts;
         [SerializeField] private string _portName = "";
 
+        // Logs every outgoing instruction. During balancing that is ~7 Debug.Log calls a second,
+        // each one capturing a stack trace, which the control loop cannot afford. Incoming lines
+        // are still logged unconditionally - with VERBOSE_SERIAL_LOGGING off in the firmware the
+        // Teensy only replies to PING, so there is nothing left to spam.
+        [SerializeField] private bool _logEveryOutgoingMessage = false;
+
         private SerialPort _port;
         private readonly object _portLock = new object();
         private readonly StringBuilder _receiveBuffer = new StringBuilder();
@@ -160,8 +166,10 @@ namespace HighPrecisionStepperJuggler
             {
                 try
                 {
-                    // Log outgoing serial messages to help debugging
-                    Debug.Log("[SerialInterface] Sending: " + s);
+                    if (_logEveryOutgoingMessage)
+                    {
+                        Debug.Log("[SerialInterface] Sending: " + s);
+                    }
 
                     if (_port != null && _port.IsOpen)
                     {

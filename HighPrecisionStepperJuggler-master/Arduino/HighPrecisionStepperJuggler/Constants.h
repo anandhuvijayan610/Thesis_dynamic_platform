@@ -1,4 +1,4 @@
-/*
+﻿/*
   Constants
   Author:
   */
@@ -50,6 +50,13 @@
 // while still allowing peak step rates of ~25k steps/s (one toggle per 2 ticks).
 #define FREQUENCY_MULTIPLIER 0.00001f
 #define TIMER_US 10
+
+// Set to 1 to echo every received instruction, its parsed tokens and the per-motor pulse
+// counts back over serial. Invaluable while bringing the link up, but during balancing Unity
+// sends ~7 instructions/s and each one produces ~10 reply lines, which Unity then Debug.Logs -
+// enough serial traffic and editor-console churn to add real latency and jitter to a control
+// loop that only runs at 6.7Hz to begin with. PING still answers with PONG when this is 0.
+#define VERBOSE_SERIAL_LOGGING 0
 
 // NOTE: SineStepper and MoveBatch ids must be lower then MAX_NUM_OF_STEPPERS
 #define MAX_NUM_OF_STEPPERS 10

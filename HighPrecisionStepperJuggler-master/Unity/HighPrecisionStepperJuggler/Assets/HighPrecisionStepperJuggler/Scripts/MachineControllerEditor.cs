@@ -19,6 +19,57 @@ namespace HighPrecisionStepperJuggler
                 script.GoToOrigin();
             }
 
+            if (GUILayout.Button("Go to mechanical zero", GUILayout.Width(200)))
+            {
+                script.GoToMechanicalZero();
+            }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Backlash test", EditorStyles.boldLabel);
+
+            var d = script.BacklashTestTiltDegrees;
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("X +" + d + " deg", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(d, 0f);
+            }
+
+            if (GUILayout.Button("X level", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(0f, 0f);
+            }
+
+            if (GUILayout.Button("X -" + d + " deg", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(-d, 0f);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Y +" + d + " deg", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(0f, d);
+            }
+
+            if (GUILayout.Button("Y level", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(0f, 0f);
+            }
+
+            if (GUILayout.Button("Y -" + d + " deg", GUILayout.Width(90)))
+            {
+                script.SendTiltTest(0f, -d);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (GUILayout.Button("Reversal cycle x5 (play mode)", GUILayout.Width(200)))
+            {
+                script.RunTiltReversalCycle(5);
+            }
+
+            EditorGUILayout.Space();
+
             if (GUILayout.Button("Go to height: 10mm", GUILayout.Width(200)))
             {
                 script.SendSingleInstruction(new HLInstruction(0.01f, 0f, 0f, 0.15f));

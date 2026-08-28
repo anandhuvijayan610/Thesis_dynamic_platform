@@ -69,14 +69,28 @@ namespace HighPrecisionStepperJuggler
         {
             var builder = new StringBuilder();
 
-            builder.Append((llInstruction.TargetMachineState.Motor1Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
-            builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor2Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
-            builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor3Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
-            builder.Append(":");
-            builder.Append((llInstruction.TargetMachineState.Motor4Rotation).ToString("0.00000", CultureInfo.InvariantCulture));
-            builder.Append(":");
+            var state = llInstruction.TargetMachineState;
+
+            // Index 0/1 are the X tilt pair, 2/3 the Y pair - see Constants.MotorWiringOrder for
+            // why the mapping to physical motors is not necessarily the identity.
+            var rotations = new[]
+            {
+                state.Motor1Rotation,
+                state.Motor2Rotation,
+                state.Motor3Rotation,
+                state.Motor4Rotation
+            };
+
+            var order = Constants.MotorWiringOrder;
+
+            for (int i = 0; i < 4; i++)
+            {
+                var index = order != null && order.Length == 4 ? order[i] : i;
+
+                builder.Append(rotations[index].ToString("0.00000", CultureInfo.InvariantCulture));
+                builder.Append(":");
+            }
+
             builder.Append(llInstruction.MoveTime.ToString("0.00000", CultureInfo.InvariantCulture));
 
             return builder.ToString();
@@ -85,10 +99,10 @@ namespace HighPrecisionStepperJuggler
         private static Color32 _black = new Color32(0,0,0,1);
         public static ref Color32 AtPosition(this Color32[] pixels, Vector2Int position)
         {
-            if (position.x < Constants.CameraResolutionWidth && position.x >= 0
-                && position.y < Constants.CameraResolutionHeight && position.y >=0)
+            if (position.x < Constants.FrameWidth && position.x >= 0
+                && position.y < Constants.FrameHeight && position.y >=0)
             {
-                return ref pixels[position.y * Constants.CameraResolutionWidth + position.x];
+                return ref pixels[position.y * Constants.FrameWidth + position.x];
             }
             else
             {

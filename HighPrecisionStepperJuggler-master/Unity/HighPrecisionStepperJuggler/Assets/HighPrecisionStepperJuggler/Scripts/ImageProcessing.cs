@@ -119,11 +119,11 @@ namespace HighPrecisionStepperJuggler
             _positiveProbePoints.Clear();
 
             // we are trying to find the boarders of all r == 255 pixel clusters.
-            for (int height = 0; height < c.CameraResolutionHeight; height += c.PixelSpacing)
+            for (int height = 0; height < c.FrameHeight; height += c.PixelSpacing)
             {
-                for (int width = 0; width < c.CameraResolutionWidth; width += c.PixelSpacing)
+                for (int width = 0; width < c.FrameWidth; width += c.PixelSpacing)
                 {
-                    var index = height * c.CameraResolutionWidth + width;
+                    var index = height * c.FrameWidth + width;
 
                     if (pixels[index].b > c.Threshold)
                     {
@@ -254,8 +254,8 @@ namespace HighPrecisionStepperJuggler
             return sortedData.Select(data => new BallRadiusAndPosition()
                 {
                     Radius = data.radius,
-                    PositionX = -data.center.x + c.CameraResolutionWidth / 2f,
-                    PositionY = -data.center.y + c.CameraResolutionHeight / 2f
+                    PositionX = -data.center.x + c.FrameWidth / 2f,
+                    PositionY = -data.center.y + c.FrameHeight / 2f
                 })
                 .ToList();
         }
@@ -326,7 +326,7 @@ namespace HighPrecisionStepperJuggler
         public BallRadiusAndPosition BallDataFromArea(Color32[] pixels)
         {
             int numberOfWhitePixels = 0;
-            var pixelWidth = c.CameraResolutionWidth;
+            var pixelWidth = c.FrameWidth;
             var accumulatedPixelX = 0;
             var accumulatedPixelY = 0;
 
@@ -359,7 +359,7 @@ namespace HighPrecisionStepperJuggler
 
             /*
             // color pixel at ball centre white
-            var meanPixelIndex = (int) meanPixelY * c.CameraResolutionWidth + (int) meanPixelX;
+            var meanPixelIndex = (int) meanPixelY * c.FrameWidth + (int) meanPixelX;
             _pixels[meanPixelIndex].r = 1;
             _pixels[meanPixelIndex].g = 1;
             _pixels[meanPixelIndex].b = 1;
@@ -371,8 +371,8 @@ namespace HighPrecisionStepperJuggler
             return new BallRadiusAndPosition()
             {
                 Radius = pixelRadius,
-                PositionX = -meanPixelX + c.CameraResolutionWidth / 2f,
-                PositionY = -meanPixelY + c.CameraResolutionHeight / 2f
+                PositionX = -meanPixelX + c.FrameWidth / 2f,
+                PositionY = -meanPixelY + c.FrameHeight / 2f
             };
         }
     }

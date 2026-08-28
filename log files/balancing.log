@@ -1,0 +1,746 @@
+Initiating legacy licensing module
+
+LICENSE SYSTEM [2026826 16:21:18] Next license update check is after 2026-02-21T12:48:39
+
+Built from 'HEAD' branch; Version is '2019.2.23f1 (87f4fccf3219) revision 8910076'; Using compiler version '191627012'
+OS: 'Windows 10  (10.0.0) 64bit' Language: 'en' Physical Memory: 16205 MB
+BatchMode: 0, IsHumanControllingUs: 1, StartBugReporterOnCrash: 1, Is64bit: 1, IsPro: 0
+[Package Manager] Server::Start -- Port 58080 was selected
+
+ COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Unity.exe
+-projectpath
+C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler
+-acceptSoftwareTermsForThisRunOnly
+-useHub
+-hubIPC
+-cloudEnvironment
+production
+-licensingIpc
+LicenseClient-91701
+-hubSessionId
+9c97340a-7cd7-490e-b1de-4d1b3e30da37
+-accessToken
+eyLJr8QtXk6FlctJctJHP5FvVCrZUpL7NnVFF4o15BU008f
+Successfully changed project path to: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler
+C:/Users/91701/Desktop/Thesis/HighPrecisionStepperJuggler-master/Unity/HighPrecisionStepperJuggler
+Using Asset Import Pipeline V1.
+Loading GUID <-> Path mappings...0.000156 seconds
+Loading Asset Database...0.047811 seconds
+AssetDatabase consistency checks...0.048700 seconds
+[Package Manager] Done resolving packages in 1.10s seconds
+[Package Manager] 
+Registered 44 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.collab-proxy@1.2.16 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.collab-proxy@1.2.16)
+    com.unity.ext.nunit@1.0.0 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ext.nunit@1.0.0)
+    com.unity.ide.rider@1.1.0 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ide.rider@1.1.0)
+    com.unity.ide.vscode@1.1.3 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ide.vscode@1.1.3)
+    com.unity.test-framework@1.0.13 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.test-framework@1.0.13)
+    com.unity.textmeshpro@2.0.1 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.textmeshpro@2.0.1)
+    com.unity.render-pipelines.core@6.9.1 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.render-pipelines.core@6.9.1)
+    com.unity.shadergraph@6.9.1 (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.shadergraph@6.9.1)
+    com.unity.visualeffectgraph@6.9.1-preview (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.visualeffectgraph@6.9.1-preview)
+  Built-in packages:
+    com.unity.package-manager-ui@2.2.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.package-manager-ui)
+    com.unity.timeline@1.1.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.timeline)
+    com.unity.ugui@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui)
+    com.unity.modules.ai@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Program Files\Unity\Hub\Editor\2019.2.23f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.xr)
+  Local packages:
+    com.unity.render-pipelines.high-definition@file:C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\ScriptableRenderPipeline-6.9.1\com.unity.render-pipelines.high-definition (location: C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\ScriptableRenderPipeline-6.9.1\com.unity.render-pipelines.high-definition)
+
+[XR] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.02s seconds
+Refreshing native plugins compatible for Editor in 12.71 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+IsTimeToCheckForNewEditor: Update time 1787754100 current 1787754082
+Initialize engine version: 2019.2.23f1 (87f4fccf3219)
+[XR] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/Resources/UnitySubsystems
+[XR] Discovering subsystems at path C:/Users/91701/Desktop/Thesis/HighPrecisionStepperJuggler-master/Unity/HighPrecisionStepperJuggler/Assets
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 3050 Laptop GPU (ID=0x25a2)
+    Vendor:   
+    VRAM:     3962 MB
+    Driver:   32.0.15.9186
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'IndirectDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'ForwardDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'VisibilityDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - All passes removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'IndirectDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'ForwardDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'VisibilityDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - All passes removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+[EnlightenBakeManager] m_Clear = false;
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56024
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll
+Registered in 0.006339 seconds.
+Native extension for WebGL target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.37 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  3.290 seconds
+Registering precompiled user dll's ...
+Registered in 0.159742 seconds.
+Platform modules already initialized, skipping
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ext.nunit@1.0.0\net35\unity-custom\nunit.framework.dll
+Native extension for WebGL target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.38 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.945 seconds
+Platform modules already initialized, skipping
+Validating Project structure ... 0.010438 seconds.
+Refresh: detecting if any assets need to be imported or removed ...
+Refreshing native plugins compatible for Editor in 0.40 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Refresh: detecting if any assets need to be imported or removed ...
+
+Refresh Completed time: 0.083197s
+	Asset Scan time: 0.081465s
+	Asset Hashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Scripting) time: 0.000000s (count: 0)
+	Post Processs Assets (Scripting) time: 0.000000s
+	Asset Rehashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Non Scripting) time: 0.000000s (count: 0)
+	Post Process Assets (Non Scripting) time: 0.000000s
+	Dependent Assets to Import Queue time: 0.000000s
+
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'IndirectDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'ForwardDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - Pass 'VisibilityDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Unlit' - All passes removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'IndirectDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'ForwardDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - Pass 'VisibilityDXR' has no vertex shader
+WARNING: Shader Unsupported: 'HDRP/Lit' - All passes removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.04 seconds
+Warming cache for 4706 main assets: 0.008259 seconds elapsed
+Initializing Unity extensions:
+ 'C:/Program Files/Unity/Hub/Editor/2019.2.23f1/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll'  GUID: 4ba2329b63d54f0187bcaa12486b1b0f
+Unloading 2952 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Assets/HighPrecisionStepperJuggler/MainScene.unity'
+	Deserialize:            123.221 ms
+	Integration:            211.114 ms
+	Integration of assets:  21.014 ms
+	Thread Wait Time:       23.978 ms
+	Total Operation Time:   379.326 ms
+System memory in use before: 94.5 MB.
+System memory in use after: 94.8 MB.
+
+Unloading 285 unused Assets to reduce memory usage. Loaded Objects now: 5909.
+Total: 3.827800 ms (FindLiveObjects: 0.668700 ms CreateObjectMapping: 0.237300 ms MarkObjects: 2.734700 ms  DeleteObjects: 0.186700 ms)
+
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+<RI> Initializing input.
+<RI> Input initialized.
+[Project] Loading completed in 13.808 seconds
+	Project init time: 				13.003 seconds
+		Template init time: 		0.000 seconds
+		Services packages init time: 	1.441 seconds
+		Package Manager init time: 		0.121 seconds
+		Asset Database init time: 		2.291 seconds
+		Global illumination init time: 	0.461 seconds
+		Assemblies load time: 			6.730 seconds
+		Unity extensions init time: 	0.001 seconds
+		Asset Database refresh time: 	0.083 seconds
+	Scene opening time: 			0.670 seconds
+Unloading 73 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 403.7 MB.
+System memory in use after: 404.0 MB.
+
+Unloading 38 unused Assets to reduce memory usage. Loaded Objects now: 6408.
+Total: 17.997400 ms (FindLiveObjects: 1.265000 ms CreateObjectMapping: 0.570300 ms MarkObjects: 16.006000 ms  DeleteObjects: 0.155200 ms)
+
+Created GICache directory at C:/Users/91701/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.061s, timestamps: [15.285 - 15.346]
+Setting up 6 worker threads for Enlighten.
+  Thread -> id: 4c50 -> priority: 1 
+  Thread -> id: 4f68 -> priority: 1 
+  Thread -> id: 3e88 -> priority: 1 
+  Thread -> id: 2e08 -> priority: 1 
+  Thread -> id: 3b4c -> priority: 1 
+  Thread -> id: 2028 -> priority: 1 
+TrimDiskCacheJob: Current cache size 3mb
+Refresh: detecting if any assets need to be imported or removed ...
+
+Refresh Completed time: 0.136134s
+	Asset Scan time: 0.133114s
+	Asset Hashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Scripting) time: 0.000000s (count: 0)
+	Post Processs Assets (Scripting) time: 0.000000s
+	Asset Rehashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Non Scripting) time: 0.000000s (count: 0)
+	Post Process Assets (Non Scripting) time: 0.000000s
+	Dependent Assets to Import Queue time: 0.000000s
+
+Reloading assemblies for play mode.
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ext.nunit@1.0.0\net35\unity-custom\nunit.framework.dll
+Native extension for WebGL target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 1.77 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.645 seconds
+Platform modules already initialized, skipping
+[SerialInterface] Available ports: COM3
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.SerialInterface:Awake() (at Assets\HighPrecisionStepperJuggler\Scripts\SerialInterface.cs:41)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/SerialInterface.cs Line: 41)
+
+[SerialInterface] Configured port name: COM3
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.SerialInterface:Awake() (at Assets\HighPrecisionStepperJuggler\Scripts\SerialInterface.cs:42)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/SerialInterface.cs Line: 42)
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            10.917 ms
+	Integration:            42.743 ms
+	Integration of assets:  0.012 ms
+	Thread Wait Time:       18.626 ms
+	Total Operation Time:   72.298 ms
+[Camera] Controls applied via DSHOW - driver accepted: AutoExposure=-1, Exposure=-5, Gain=110, Saturation=160, Contrast=25, Brightness=64, Gamma=150. NOTE: the streaming MSMF capture reports its own unrelated values for these, so judge by the image, not by the Camera Properties readback below.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.UVCCameraPlugin:ApplyCameraControls() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:495)
+HighPrecisionStepperJuggler.UVCCameraPlugin:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:210)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/UVCCamera/UVCCameraPlugin.cs Line: 495)
+
+[Camera] Requested FPS=120, cap->set() returned=1 (0=driver rejected the call), driver readback FPS=120.00048000192, FOURCC readback='
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.UVCCameraPlugin:ConfigureStreamFormat() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:301)
+HighPrecisionStepperJuggler.UVCCameraPlugin:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:233)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/UVCCamera/UVCCameraPlugin.cs Line: 301)
+
+[ImageProcessing] Strategy program: BalancingOnly (2 stage(s)). Press Space to arm.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:207)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 207)
+
+Waiting for the plate to reach the working origin before starting detection.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Update() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:423)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 423)
+
+gi::BakeBackendSwitch: Clear() active clients.
+gi::BakeBackendSwitch: switching bake backend from 3 to 1.
+[MachineController] Machine End Point: ModelAndReal.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:131)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 131)
+
+[MachineController] Plate parked at working origin: 2mm above the mechanical dead position. All high-level heights are now measured from here.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:134)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 134)
+
+Refresh: detecting if any assets need to be imported or removed ...
+
+Refresh Completed time: 0.131199s
+	Asset Scan time: 0.128266s
+	Asset Hashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Scripting) time: 0.000000s (count: 0)
+	Post Processs Assets (Scripting) time: 0.000000s
+	Asset Rehashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Non Scripting) time: 0.000000s (count: 0)
+	Post Process Assets (Non Scripting) time: 0.000000s
+	Dependent Assets to Import Queue time: 0.000000s
+
+[PlateCheck] Measuring what tilt the plate actually delivers, using the ball as the inclinometer. Keep the ball near the centre of the plate. This takes about a minute.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:728)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+UnityEngine.MonoBehaviour:StartCoroutineManaged2(IEnumerator)
+UnityEngine.MonoBehaviour:StartCoroutine(IEnumerator) (at C:\build\output\unity\unity\Runtime\Export\Scripting\MonoBehaviour.bindings.cs:91)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:TryStartMachineRoutine(String, IEnumerator) (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:526)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Update() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:360)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 728)
+
+[Calibration] The ball was still drifting when the sweep started; the +/- difference cancels that, so the measurement still stands.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<SettleBall>d__81:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:1021)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 1021)
+
+[Calibration] The ball was still drifting when the sweep started; the +/- difference cancels that, so the measurement still stands.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<SettleBall>d__81:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:1021)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 1021)
+
+[PlateCheck] Lost the ball during the X sweep at 1 deg. Re-centre it and press P again.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:766)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 766)
+
+Refresh: detecting if any assets need to be imported or removed ...
+
+Refresh Completed time: 0.117123s
+	Asset Scan time: 0.114264s
+	Asset Hashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Scripting) time: 0.000000s (count: 0)
+	Post Processs Assets (Scripting) time: 0.000000s
+	Asset Rehashing: 0.000000s [0 B, 0.000000 mb/s]
+	Asset Import (Non Scripting) time: 0.000000s (count: 0)
+	Post Process Assets (Non Scripting) time: 0.000000s
+	Dependent Assets to Import Queue time: 0.000000s
+
+Unloading 255 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            12.386 ms
+	Integration:            10.876 ms
+	Integration of assets:  0.003 ms
+	Thread Wait Time:       15.963 ms
+	Total Operation Time:   39.228 ms
+System memory in use before: 119.5 MB.
+System memory in use after: 119.9 MB.
+
+Unloading 250 unused Assets to reduce memory usage. Loaded Objects now: 6215.
+Total: 9.704100 ms (FindLiveObjects: 0.639300 ms CreateObjectMapping: 0.224500 ms MarkObjects: 8.683400 ms  DeleteObjects: 0.156300 ms)
+
+Unloading 39 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 415.3 MB.
+System memory in use after: 415.8 MB.
+
+Unloading 38 unused Assets to reduce memory usage. Loaded Objects now: 6509.
+Total: 13.056400 ms (FindLiveObjects: 0.741000 ms CreateObjectMapping: 0.258600 ms MarkObjects: 12.007600 ms  DeleteObjects: 0.048400 ms)
+
+Reloading assemblies for play mode.
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image C:\Users\91701\Desktop\Thesis\HighPrecisionStepperJuggler-master\Unity\HighPrecisionStepperJuggler\Library\PackageCache\com.unity.ext.nunit@1.0.0\net35\unity-custom\nunit.framework.dll
+Native extension for WebGL target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 1.61 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.409 seconds
+Platform modules already initialized, skipping
+[SerialInterface] Available ports: COM3
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.SerialInterface:Awake() (at Assets\HighPrecisionStepperJuggler\Scripts\SerialInterface.cs:41)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/SerialInterface.cs Line: 41)
+
+[SerialInterface] Configured port name: COM3
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.SerialInterface:Awake() (at Assets\HighPrecisionStepperJuggler\Scripts\SerialInterface.cs:42)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/SerialInterface.cs Line: 42)
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            8.544 ms
+	Integration:            37.605 ms
+	Integration of assets:  0.002 ms
+	Thread Wait Time:       10.506 ms
+	Total Operation Time:   56.657 ms
+[Camera] Controls applied via DSHOW - driver accepted: AutoExposure=-1, Exposure=-5, Gain=110, Saturation=160, Contrast=25, Brightness=64, Gamma=150. NOTE: the streaming MSMF capture reports its own unrelated values for these, so judge by the image, not by the Camera Properties readback below.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.UVCCameraPlugin:ApplyCameraControls() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:495)
+HighPrecisionStepperJuggler.UVCCameraPlugin:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:210)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/UVCCamera/UVCCameraPlugin.cs Line: 495)
+
+[Camera] Requested FPS=120, cap->set() returned=1 (0=driver rejected the call), driver readback FPS=120.00048000192, FOURCC readback='
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.UVCCameraPlugin:ConfigureStreamFormat() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:301)
+HighPrecisionStepperJuggler.UVCCameraPlugin:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\UVCCamera\UVCCameraPlugin.cs:233)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/UVCCamera/UVCCameraPlugin.cs Line: 301)
+
+[ImageProcessing] Strategy program: BalancingOnly (2 stage(s)). Press Space to arm.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Start() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:207)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 207)
+
+Waiting for the plate to reach the working origin before starting detection.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Update() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:423)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 423)
+
+[MachineController] Machine End Point: ModelAndReal.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:131)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 131)
+
+[MachineController] Plate parked at working origin: 2mm above the mechanical dead position. All high-level heights are now measured from here.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:134)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 134)
+
+[PlateCheck] Measuring what tilt the plate actually delivers, using the ball as the inclinometer. Keep the ball near the centre of the plate. This takes about a minute.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:728)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+UnityEngine.MonoBehaviour:StartCoroutineManaged2(IEnumerator)
+UnityEngine.MonoBehaviour:StartCoroutine(IEnumerator) (at C:\build\output\unity\unity\Runtime\Export\Scripting\MonoBehaviour.bindings.cs:91)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:TryStartMachineRoutine(String, IEnumerator) (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:526)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Update() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:360)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 728)
+
+[PlateCheck] Commanded LEVEL: the ball still accelerates 13 mm/s^2, so the plate sits about 0.13 deg off level. Anything past ~0.3 deg will bias the balancing loop.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:739)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 739)
+
+[PlateCheck] X commanded 1.0 deg -> ball accelerates 31 mm/s^2 -> plate delivered about 0.30 deg (30% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] X commanded 2.0 deg -> ball accelerates 81 mm/s^2 -> plate delivered about 0.79 deg (40% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] X commanded 3.0 deg -> ball accelerates 88 mm/s^2 -> plate delivered about 0.86 deg (29% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] X commanded 5.0 deg -> ball accelerates 194 mm/s^2 -> plate delivered about 1.89 deg (38% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] X AXIS: median plant gain 35.0 mm/s^2 per commanded deg = 0.34 deg delivered per commanded deg, from 4 readings spanning 32%. A lot of the commanded tilt is lost in the linkage - most likely flex, or the four arms fighting each other, since a rigid plate on four arms is over-constrained in tilt. Provided it is a uniform loss and not a deadband the controller is simply tuned around it, which is done automatically.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:817)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 817)
+
+[PlateCheck] Y commanded 1.0 deg -> ball accelerates 53 mm/s^2 -> plate delivered about 0.52 deg (52% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] Y commanded 2.0 deg -> ball accelerates 159 mm/s^2 -> plate delivered about 1.55 deg (77% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] Y commanded 3.0 deg -> ball accelerates 163 mm/s^2 -> plate delivered about 1.58 deg (53% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] Y commanded 5.0 deg -> ball accelerates 302 mm/s^2 -> plate delivered about 2.94 deg (59% of what was asked for).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:794)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 794)
+
+[PlateCheck] Y AXIS: median plant gain 57.3 mm/s^2 per commanded deg = 0.56 deg delivered per commanded deg, from 4 readings spanning 45%. A lot of the commanded tilt is lost in the linkage - most likely flex, or the four arms fighting each other, since a rigid plate on four arms is over-constrained in tilt. Provided it is a uniform loss and not a deadband the controller is simply tuned around it, which is done automatically.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:817)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 817)
+
+[PlateCheck] Measured plant gain 46.1 mm/s^2 per commanded deg (45% of an ideal plate). PD gains set to k_p = k_d = 0.067 (were 0.030) - that restores the designed 3.2 rad/s crossover and +45 deg phase margin against YOUR plate.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:ApplyGainsFor(List`1) (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:853)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:822)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 853)
+
+[PlateCheck] Done. Plate left level.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<PlateResponseRoutine>d__73:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:824)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 824)
+
+[Arm] First arm this session - measuring the camera-to-plate axis mapping before handing the machine the ball. Keep the ball on the plate.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<ArmRoutine>d__66:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:551)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 551)
+
+[TiltSign] Trying +-2 deg. Keep the ball near the centre of the plate.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<TiltSignCheckRoutine>d__69:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:621)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 621)
+
+[TiltSign] X at +-2 deg: ball drifted (-1.7, 2.7) mm one way and (4.5, -5.0) mm the other in 0.15s. Difference (-6.2, 7.8) mm = 9.9 mm.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<TiltSignCheckRoutine>d__69:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:640)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 640)
+
+[TiltSign] Y at +-2 deg: ball drifted (1.4, -3.5) mm one way and (-6.1, 3.0) mm the other in 0.15s. Difference (7.5, -6.5) mm = 9.9 mm.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<TiltSignCheckRoutine>d__69:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:640)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 640)
+
+[TiltSign] Ball responds from 2 deg of commanded tilt. That is healthy.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<TiltSignCheckRoutine>d__69:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:677)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 677)
+
+[TiltSign] Axis mapping set: swap=True, invertX=False, invertY=True (CHANGED).
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:ReportTiltSignCheck(Vector2, Vector2) (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:1095)
+HighPrecisionStepperJuggler.<TiltSignCheckRoutine>d__69:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:684)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 1095)
+
+[Arm] Balancing. The plate lifts the side the ball is rolling toward and walks it back to the target.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<ArmRoutine>d__66:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:568)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 568)
+
+Ball lost for 0.36s - disarming control strategies and returning the plate to the working origin. Put the ball back on the plate and press Space to re-arm.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:AbortOnBallLost() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:1127)
+HighPrecisionStepperJuggler.ImageProcessingInstructionSender:Update() (at Assets\HighPrecisionStepperJuggler\Scripts\ImageProcessingInstructionSender.cs:442)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/ImageProcessingInstructionSender.cs Line: 1127)
+
+[MachineController] Machine End Point: ModelAndReal.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:131)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 131)
+
+[MachineController] Plate parked at working origin: 2mm above the mechanical dead position. All high-level heights are now measured from here.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+HighPrecisionStepperJuggler.<MoveToWorkingOriginRoutine>d__27:MoveNext() (at Assets\HighPrecisionStepperJuggler\Scripts\MachineController.cs:134)
+UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr) (at C:\build\output\unity\unity\Runtime\Export\Scripting\Coroutines.cs:17)
+ 
+(Filename: Assets/HighPrecisionStepperJuggler/Scripts/MachineController.cs Line: 134)
+

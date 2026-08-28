@@ -8101,6 +8101,7 @@ MonoBehaviour:
   _realMachine: {fileID: 165232599}
   _modelMachine: {fileID: 333164413}
   _machineEndPoint: 2
+  _originHeightOffsetMm: 20
 --- !u!4 &1395260053
 Transform:
   m_ObjectHideFlags: 0
@@ -8140,6 +8141,12 @@ MonoBehaviour:
   _targetCrossVisualizer: {fileID: 1117639990}
   _currentPositionCrossVisualizer: {fileID: 42406167}
   _machineStateView: {fileID: 346410669}
+  _strategyProgram: 2
+  _smallJugglingExtraCycles: 1
+  _jugglingBounceRiseMm: 8
+  _jugglingBounceMoveTime: 0.1
+  _ballLostRecoveryHeightMm: 10
+  _ballLostRecoveryMoveTime: 0.3
 --- !u!1 &1399602468
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,8 +7,18 @@ namespace HighPrecisionStepperJuggler
 {
     public static class BallControlStrategyFactory
     {
+        // NOTE: the original body of this method ignored lowPos/highPos entirely and hardcoded
+        // 0.06f/0.05f, so passing anything else silently did nothing - the swing was always 10mm
+        // however this was called. Fixed to actually use the parameters. The defaults are set to
+        // exactly what was hardcoded (0.05/0.06), so every EXISTING zero-argument call site keeps
+        // behaving identically - only a caller that passes lowPos/highPos explicitly is affected.
+        //
+        // (The old defaults of 0.5f/0.6f were themselves nonsense - 500mm/600mm plate heights,
+        // unreachable by this machine - and were never actually used by any real caller because the
+        // hardcoded body ignored them too. Left as evidence should anyone go looking; the real
+        // defaults now are the ones that matter.)
         public static IBallControlStrategy Bouncing(int duration, ITiltController tiltController,
-            float lowPos = 0.5f, float highPos = 0.6f, float moveTime = 0.1f, Action action = null)
+            float lowPos = 0.05f, float highPos = 0.06f, float moveTime = 0.1f, Action action = null)
         {
             return new BallControlStrategy((ballData, machineController, instructionCount) =>
             {
@@ -27,8 +37,8 @@ namespace HighPrecisionStepperJuggler
 
                     machineController.SendInstructions(new List<HLInstruction>()
                     {
-                        new HLInstruction(0.06f, xCorrection, yCorrection, moveTime),
-                        new HLInstruction(0.05f, 0f, 0f, moveTime),
+                        new HLInstruction(highPos, xCorrection, yCorrection, moveTime),
+                        new HLInstruction(lowPos, 0f, 0f, moveTime),
                     });
 
                     return true;
@@ -161,7 +171,7 @@ namespace HighPrecisionStepperJuggler
         }
 
         public static IBallControlStrategy Balancing(float height, int duration, Vector2 target,
-            ITiltController tiltController, Action action = null)
+            ITiltController tiltController, float moveTime = 0.1f, Action action = null)
         {
             return new BallControlStrategy((ballData, machineController, instructionCount) =>
             {
@@ -177,7 +187,6 @@ namespace HighPrecisionStepperJuggler
                     var xCorrection = Mathf.Clamp(tilt.xTilt, c.MinTiltAngle, c.MaxTiltAngle);
                     var yCorrection = Mathf.Clamp(tilt.yTilt, c.MinTiltAngle, c.MaxTiltAngle);
 
-                    var moveTime = 0.1f;
                     machineController.SendInstructions(new List<HLInstruction>()
                     {
                         new HLInstruction(height, xCorrection, yCorrection, moveTime),

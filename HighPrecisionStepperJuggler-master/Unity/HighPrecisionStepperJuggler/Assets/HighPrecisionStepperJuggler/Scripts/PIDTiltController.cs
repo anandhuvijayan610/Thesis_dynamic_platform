@@ -23,9 +23,16 @@ namespace HighPrecisionStepperJuggler.MachineLearning
             float airborneTime)
         {
             _targetCrossVisualizer.UpdateCrossPosition(targetPosition);
-            
-            var p_x = -position.x * Constants.k_p;
-            var p_y = -position.y * Constants.k_p;
+
+            // The proportional term is driven by the ERROR, not the raw position. This used to
+            // ignore targetPosition entirely, which silently pinned the controller to the plate
+            // centre no matter what target a strategy asked for. Every existing caller passes
+            // Vector2.zero, so this changes nothing in the original demo - it only makes a
+            // non-zero balancing target actually work.
+            var error = position - targetPosition;
+
+            var p_x = -error.x * Constants.k_p;
+            var p_y = -error.y * Constants.k_p;
 
             var d_x = -velocity.x * Constants.k_d;
             var d_y = -velocity.y * Constants.k_d;

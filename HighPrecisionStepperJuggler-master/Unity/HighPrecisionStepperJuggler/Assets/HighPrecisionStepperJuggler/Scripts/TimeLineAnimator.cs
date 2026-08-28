@@ -13,9 +13,20 @@ namespace HighPrecisionStepperJuggler.MachineLearning
         [SerializeField] private MachineStateView _machineStateView;
         [SerializeField] private CameraTweener _cameraTweener;
 
+        // Presentation effect from the original demo reel: once the control strategies are armed,
+        // walk the on-screen image through every ImgMode, half a second each, ending on the
+        // detection mode. It is PURELY cosmetic and it breaks actual operation - only imgMode 7
+        // produces ball data, so while the reveal is running the machine is blind, and the first
+        // IncrementImgMode() call wraps a hand-set mode 7 straight back to Src. Leave this off
+        // unless you are recording the demo.
+        [SerializeField] private bool _animateImageSourceForDemo = false;
+
         private void Start()
         {
-            SetupImageSourceSwitchThroughAnimation();
+            if (_animateImageSourceForDemo)
+            {
+                SetupImageSourceSwitchThroughAnimation();
+            }
 
             CompositeDisposable cd = new CompositeDisposable();
 

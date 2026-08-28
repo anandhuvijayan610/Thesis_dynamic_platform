@@ -1,4 +1,4 @@
-  /*
+﻿  /*
   HighPrecisionStepperJuggler
   Author: T-Kuhn.
   Sapporo, January, 2020. Released into the public domain.
@@ -78,11 +78,21 @@ void loop()
         else
         {
             // We have received a LF or CR character
-            // Debug: echo the raw received message
+            inputBuffer[s_len] = 0;
+
+            // Liveness check. Handled before strtok(), which destroys the buffer.
+            if (strcmp(inputBuffer, "PING") == 0)
+            {
+                Serial.println("PONG");
+                memset(inputBuffer, 0, sizeof(inputBuffer));
+                s_len = 0;
+                return;
+            }
+
+#if VERBOSE_SERIAL_LOGGING
             Serial.print("RECEIVED MSG: ");
             Serial.println(inputBuffer);
-
-            inputBuffer[s_len] = 0;
+#endif
 
             currentMode = idle;
             // Discard batches left over from the previous command so they can't
@@ -105,7 +115,9 @@ void loop()
                 index++;
             }
 
-            // Debug: print parsed tokens
+            int numOfMoveBatches = index / 6;
+
+#if VERBOSE_SERIAL_LOGGING
             Serial.print("Parsed tokens (count=");
             Serial.print(index);
             Serial.print("): ");
@@ -116,30 +128,30 @@ void loop()
             }
             Serial.println();
 
-            int numOfMoveBatches = index / 6;
-
             Serial.print("Num of move batches: ");
             Serial.println(numOfMoveBatches);
+#endif
 
             for (int i = 0; i < numOfMoveBatches; i++)
             {
                 int offset = i * 6;
                 MoveBatch *mb = &sineStepperController.moveBatches[i];
                 
-                // Debug: show marker check
+#if VERBOSE_SERIAL_LOGGING
                 Serial.print("Batch "); Serial.print(i); Serial.print(" marker value: "); Serial.println(instructionData[offset], 5);
+#endif
 
                 if (instructionData[offset] > ((i + 1) * 11.0) - 0.1 && instructionData[offset] < ((i + 1) * 11) + 0.1)
                 {
-                    Serial.println("Marker matches expected value.");
-                    mb->addMove(/*id:*/ 0, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 1] / (M_PI * 2))));
-                    Serial.print("Motor0 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 1] / (M_PI * 2))));
-                    mb->addMove(/*id:*/ 1, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 2] / (M_PI * 2))));
-                    Serial.print("Motor1 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 2] / (M_PI * 2))));
-                    mb->addMove(/*id:*/ 2, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2))));
-                    Serial.print("Motor2 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2))));
-                    mb->addMove(/*id:*/ 3, /*pos:*/ (int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
-                    Serial.print("Motor3 pulses: "); Serial.println((int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2))));
+                    int32_t p0 = (int32_t)(PULSES_PER_REV * (instructionData[offset + 1] / (M_PI * 2)));
+                    int32_t p1 = (int32_t)(PULSES_PER_REV * (instructionData[offset + 2] / (M_PI * 2)));
+                    int32_t p2 = (int32_t)(PULSES_PER_REV * (instructionData[offset + 3] / (M_PI * 2)));
+                    int32_t p3 = (int32_t)(PULSES_PER_REV * (instructionData[offset + 4] / (M_PI * 2)));
+
+                    mb->addMove(/*id:*/ 0, /*pos:*/ p0);
+                    mb->addMove(/*id:*/ 1, /*pos:*/ p1);
+                    mb->addMove(/*id:*/ 2, /*pos:*/ p2);
+                    mb->addMove(/*id:*/ 3, /*pos:*/ p3);
 
                     float requestedMoveDuration = instructionData[offset + 5];
                     if (requestedMoveDuration < MOVE_DURATION)
@@ -147,7 +159,15 @@ void loop()
                         requestedMoveDuration = MOVE_DURATION;
                     }
                     mb->moveDuration = requestedMoveDuration;
+
+#if VERBOSE_SERIAL_LOGGING
+                    Serial.println("Marker matches expected value.");
+                    Serial.print("Motor0 pulses: "); Serial.println(p0);
+                    Serial.print("Motor1 pulses: "); Serial.println(p1);
+                    Serial.print("Motor2 pulses: "); Serial.println(p2);
+                    Serial.print("Motor3 pulses: "); Serial.println(p3);
                     Serial.print("Move duration: "); Serial.println(mb->moveDuration, 5);
+#endif
                 }
                 else
                 {
