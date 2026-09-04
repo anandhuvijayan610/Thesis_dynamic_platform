@@ -1,0 +1,9 @@
+# Build artefacts
+__pycache__/
+*.pyc
+
+# Run output: CSV logs from the Session tab, and the scratch files the
+# hardware diagnostics leave behind. All are recordings of one run on one
+# machine, not source.
+*.csv
+_*.txt

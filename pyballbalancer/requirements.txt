@@ -1,0 +1,5 @@
+PyQt5>=5.15
+opencv-python>=4.5
+pyqtgraph>=0.12
+numpy>=1.20
+pyserial>=3.5
