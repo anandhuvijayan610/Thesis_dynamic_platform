@@ -25,6 +25,66 @@ namespace HighPrecisionStepperJuggler
             }
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Level the plate at origin", EditorStyles.boldLabel);
+
+            var step = script.LevelTrimStepDegrees;
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("X", GUILayout.Width(14));
+            if (GUILayout.Button("-", GUILayout.Width(88)))
+            {
+                script.NudgeLevelTrim(-1f, 0f);
+            }
+
+            if (GUILayout.Button("+", GUILayout.Width(88)))
+            {
+                script.NudgeLevelTrim(1f, 0f);
+            }
+
+            EditorGUILayout.LabelField($"X {script.LevelTrimX:0.00} deg");
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Y", GUILayout.Width(14));
+            if (GUILayout.Button("-", GUILayout.Width(88)))
+            {
+                script.NudgeLevelTrim(0f, -1f);
+            }
+
+            if (GUILayout.Button("+", GUILayout.Width(88)))
+            {
+                script.NudgeLevelTrim(0f, 1f);
+            }
+
+            EditorGUILayout.LabelField($"Y {script.LevelTrimY:0.00} deg");
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Reset trim to zero", GUILayout.Width(180)))
+            {
+                script.ResetLevelTrim();
+            }
+
+            if (GUILayout.Button("Re-send origin", GUILayout.Width(180)))
+            {
+                script.ApplyInspectorLevelTrim();
+                script.GoToOrigin();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.HelpBox(
+                $"Each nudge moves the trim by {step:0.00} deg and re-sends the origin pose, so " +
+                "adjust with a spirit level on the plate and watch it settle. The offset is then " +
+                "added to every command, including the control loop's, so a level plate here " +
+                "means the controller's zero is the real zero.\n\n" +
+                "Trim X first: tilting one pair changes how level the other looks. Re-level after " +
+                "changing the working origin - the trim is a property of the height, not of the " +
+                "machine.\n\n" +
+                "Nothing persists between runs. Copy the values you settle on into " +
+                "Constants.LevelTrimXDegrees / LevelTrimYDegrees.",
+                MessageType.None);
+
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Backlash test", EditorStyles.boldLabel);
 
             var d = script.BacklashTestTiltDegrees;

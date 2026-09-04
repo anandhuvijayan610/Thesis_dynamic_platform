@@ -313,7 +313,10 @@ namespace HighPrecisionStepperJuggler
         // Time given to each balancing correction. This IS the loop delay (plus the 50ms
         // microcontroller margin), and Constants.k_p / k_d were derived against 0.1s - shortening
         // it buys phase margin, but the gains should be re-derived if you change it much.
-        [SerializeField] private float _balancingMoveTime = 0.1f;
+        // 0.06s, from the PyQt host. Each command supersedes the one before it, so a longer move
+        // only adds lag between the tilt the controller chose and the tilt the plate is executing;
+        // the floor is the firmware's own 0.05s minimum move.
+        [SerializeField] private float _balancingMoveTime = 0.06f;
 
         private BallData _ballData;
         private int _currentStrategyIndex;
@@ -710,11 +713,30 @@ namespace HighPrecisionStepperJuggler
                 Debug.Log($"Ball position logging {(_isBallPositionLoggingEnabled ? "enabled" : "disabled")}");
             }
 
+            // Re-assert the detection image mode on every armed frame, not just once when arming.
+            // Only imgMode 7 returns real ball data; every other mode returns a fixed placeholder
+            // (radius 0.1 at the frame centre) so the machine cannot react to a debug view. B and
+            // M cycle the mode at runtime, and TimeLineAnimator can too, so a single stray
+            // keypress used to disable detection silently: the machine stayed armed, every
+            // strategy kept waiting for a ball that could never arrive, and nothing was logged.
+            if (_isExecuteControlStrategies.Value)
+            {
+                EnsureDetectionImageMode();
+            }
+
             var ballRadiusAndPosition = _cameraPlugin.UpdateImageProcessing();
 
             if (_isBallPositionLoggingEnabled)
             {
-                Debug.Log($"Ball r, x, y :{ballRadiusAndPosition.Radius}, {ballRadiusAndPosition.PositionX}, {ballRadiusAndPosition.PositionY}");
+                // Say so when it is the placeholder. "r = 0.1" reads like a measurement and is
+                // not one - it is what the plugin returns when it has nothing to report.
+                var isPlaceholder = ballRadiusAndPosition.Radius < 1f;
+                Debug.Log($"Ball r, x, y :{ballRadiusAndPosition.Radius}, " +
+                          $"{ballRadiusAndPosition.PositionX}, {ballRadiusAndPosition.PositionY}" +
+                          (isPlaceholder
+                              ? $"   <-- PLACEHOLDER, not a ball. Image mode is {_cameraPlugin.ImgMode}; "
+                                + "only CustomgrayWithInternalImageProcessing detects."
+                              : string.Empty));
             }
 
             var height = FOVCalculations.RadiusToDistance(ballRadiusAndPosition.Radius);
@@ -1704,6 +1726,12 @@ namespace HighPrecisionStepperJuggler
             {
                 strategy.Reset();
             }
+
+            // The tilt controller holds an integral term and the last command it issued. Neither
+            // means anything once the ball is gone, and carrying them over leans the plate as soon
+            // as the next ball appears - the integral having spent the whole loss winding up
+            // against an error it could never correct.
+            PIDTiltController.Instance.Reset();
 
             _currentStrategyIndex = 0;
 

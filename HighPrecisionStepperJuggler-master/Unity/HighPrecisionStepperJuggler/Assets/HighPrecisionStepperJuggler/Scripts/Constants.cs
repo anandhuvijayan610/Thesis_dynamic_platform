@@ -52,7 +52,13 @@ namespace HighPrecisionStepperJuggler
         // command asks for a non-planar set of heights, the arms fight each other and the plate
         // barely moves. On this machine the identity order is the one that moves it, so physical
         // motors 0/1 really are on opposite corners, and 2/3 on the other pair. Press R to re-test.
-        public static int[] MotorWiringOrder = {0, 1, 2, 3};
+        // {0,2,1,3} since 2026-09-04, matching the PyQt host's "0+2 / 1+3" pairing. The identity
+        // was measured correct on 2026-08-26, but the PyQt app re-tested it later by scoring which
+        // pairing actually HOLDS a ball rather than which one moves the plate, and the user then
+        // confirmed 0+2 / 1+3 on the physical machine. Where the two disagree the later,
+        // ball-in-the-loop measurement wins. The index semantics are identical in both hosts:
+        // the wire slot i carries rotations[order[i]].
+        public static int[] MotorWiringOrder = {0, 2, 1, 3};
 
         public const float HeightOrigin = 0.0566f;
 
@@ -81,7 +87,12 @@ namespace HighPrecisionStepperJuggler
         // against +-45.1mm at 40mm. At the current 10mm the origin is the tightest point of the
         // program - the room where the ball is actually moving comes from the juggling base height
         // instead. See MachineController._originHeightOffsetMm.
-        public static float OriginHeightOffset = 0.010f;
+        // 20mm since 2026-09-04. Raised from 10mm because the firmware's zero is its POWER-ON
+        // position, not true mechanical dead, and after skipped steps the two drift apart - the
+        // plate then sits lower than this number claims and the linkage starts to foul. If it
+        // fouls again, power-cycle with the plate at rest BEFORE adding more here, or this
+        // becomes the running tally of every step ever lost.
+        public static float OriginHeightOffset = 0.020f;
         public const int BaudRate = 921600;
 
         // Re-calibrated 2026-08-26 after the camera mount moved. Least-squares fit of
@@ -112,8 +123,43 @@ namespace HighPrecisionStepperJuggler
         public static readonly LLMachineState OriginMachineState = new HLMachineState(0f, 0f, 0f).Translate();
         public static readonly LLMachineState ZeroMachineState = new LLMachineState(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f);
 
-        public static float MaxTiltAngle = 5f;
-        public static float MinTiltAngle = -5f;
+        // +-3, not +-5. The controller never needs more than this to steer a ball that is on the
+        // plate, and the extra range only ever arrived as a lurch: a large tilt swings the plate
+        // corner through millimetres in a tenth of a second, and the vertical acceleration that
+        // implies flicks the ball off the surface rather than steering it.
+        //
+        // Note the LEVEL TRIM is added AFTER this clamp, in MachineController.SendInstructions,
+        // and is deliberately not subject to it - it is a calibration offset, not a command, and
+        // clamping it would quietly un-level the plate at large tilts.
+        public static float MaxTiltAngle = 3f;
+        public static float MinTiltAngle = -3f;
+
+        // Standing tilt of the plate when all four arms sit at the working origin, cancelled out.
+        // Added to every commanded tilt at the single chokepoint every instruction passes through,
+        // so a "level" command becomes whatever actually makes the plate level and the controllers
+        // work in a frame where zero means zero instead of fighting a constant bias.
+        //
+        // Set by hand against a spirit level - see the "Level the plate at origin" section of the
+        // MachineController inspector, which nudges these and re-sends the origin pose so the
+        // plate can be watched as it settles. Trim X FIRST: tilting one pair changes how level the
+        // other pair looks, so the second axis has to be set after the first, not alongside it.
+        //
+        // THESE ARE NOT CONSTANTS OF THE MACHINE. On this rig they have read -0.20/+1.50,
+        // -1.30/+0.35, -1.40/-0.70 and now -2.50/-2.10, and Y has changed sign. The last jump came
+        // purely from raising OriginHeightOffset by 10mm, which is the clearest evidence that the
+        // trim is a property of the HEIGHT - the linkage carries a residual slope that varies
+        // along its travel. Re-level after changing the origin offset, after the arms are
+        // disturbed, and after anything that may have cost a step. The symptom of a stale trim is
+        // a ball that will not settle in the middle at ANY gain: 0.6 deg of residual tilt
+        // accelerates it at about 70 mm/s^2, which no amount of tuning removes.
+        public static float LevelTrimXDegrees = -2.50f;
+        public static float LevelTrimYDegrees = -2.10f;
+
+        // How fast the commanded tilt is allowed to change, deg/s. The clamp above bounds how FAR
+        // the plate may tilt; this bounds how fast it may get there, which is the part the ball
+        // feels. Measured on the PyQt host as the floor that still settles: 20 fails with noise
+        // and 12 fails outright, so there is little room below 25.
+        public static float MaxTiltRateDegreesPerSecond = 25f;
         public static float MaxPlateHeight = 90f;
         public static float MinPlateHeight = 0f;
 
@@ -140,8 +186,38 @@ namespace HighPrecisionStepperJuggler
         // to get back to the crossover and phase margin the pair was designed for. At 0.03 the
         // controller corrects small drifts fine but cannot arrest a ball that is already moving -
         // which is exactly the reported behaviour. Press P to re-measure and re-tune automatically.
-        public static float k_p = 0.05f;
-        public static float k_d = 0.07f;
+        // 2026-09-04: taken from the PyQt host, which is where these were last tuned against a
+        // real ball. THE UNITS DIFFER AND THE NUMBERS CANNOT BE COPIED ACROSS DIRECTLY. That host
+        // works in degrees per PIXEL, because its controller reads the camera frame; this one
+        // works in degrees per MILLIMETRE, because FOVCalculations has already converted. The
+        // conversion is the image scale at the height the gains were tuned at: the ball is 20mm in
+        // radius and measured 111px there, so 5.55 px/mm.
+        //
+        //     k_p: 0.020 deg/px * 5.55 px/mm = 0.111 deg/mm
+        //     k_d: 0.040 deg/px * 5.55 px/mm = 0.222 deg/mm
+        //
+        // Both are well above what was here before (0.05 / 0.07) and the derivative term now
+        // dominates by 2:1, which is what a delayed double integrator wants - the plate reacts to
+        // the ball's VELOCITY, lifting the side it is rolling toward, rather than waiting for the
+        // error to build.
+        //
+        // Caveat worth knowing before trusting them blindly: the two hosts smooth velocity
+        // differently. The PyQt estimator fits a line over 6 samples of a 30fps camera, i.e. 0.2s
+        // of lag, so its k_d is doing its work on a smoother signal than this pipeline provides.
+        // If the plate chatters, drop k_d first.
+        public static float k_p = 0.111f;
+        public static float k_d = 0.222f;
+
+        // Integral term, absent from this host until 2026-09-04. The PyQt controller relies on it
+        // and the behaviour does not transfer without it: what it cancels is the residual slope
+        // the linkage carries at any given height, which a PD loop can only ever fight to a
+        // standing offset. 0.100 deg/px * 5.55 = 0.555 deg/mm.
+        //
+        // The clamp is on the accumulated contribution in degrees, not on the raw sum, so it
+        // bounds the windup directly. 20 was measured as large enough never to bind during normal
+        // balancing while still bleeding off in about a second when the ball is lost.
+        public static float k_i = 0.555f;
+        public static float IntegralClampDegrees = 20f;
 
         public static float BallVisualizationFadeOutTime = 0.2f;
         public static float SmallBallVisualizationFadeOutTime = 5f;

@@ -8,6 +8,18 @@ namespace HighPrecisionStepperJuggler
     public class RealMachine : InstructableMachine
     {
         [SerializeField] private SerialInterface _serial = null;
+
+        // Echo every line sent to the Teensy into the Console.
+        //
+        // Worth turning on whenever this host's behaviour is being compared against the PyQt
+        // one: both build the wire line from the same kinematics, so with the same origin
+        // offset, pairing and trim they must emit byte-identical text. That single comparison
+        // proves the whole chain - IK, arm pairing, origin subtraction and levelling trim - in
+        // one step, and localises any difference to the settings rather than the maths.
+        //
+        // Off by default because a juggling run sends about twenty lines a second and the
+        // Console cannot keep up.
+        [SerializeField] private bool _logSentLines = false;
         
         protected override void SendInstructions(List<LLInstruction> diffInstructions)
         {
@@ -26,8 +38,11 @@ namespace HighPrecisionStepperJuggler
             builder.Append('\n');
 
             _serial.Send(builder.ToString());
-            
-            //debug.Log($"Sent to serial: {builder.ToString()}"); //debug for seeing what is being sent to the serial interface
+
+            if (_logSentLines)
+            {
+                Debug.Log($"[RealMachine] TX {builder.ToString().TrimEnd()}");
+            }
         }
 
         private void Update()

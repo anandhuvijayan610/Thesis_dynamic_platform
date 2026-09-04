@@ -8108,7 +8108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _realMachine: {fileID: 165232599}
   _modelMachine: {fileID: 333164413}
-  _originHeightOffsetMm: 10
+  _originHeightOffsetMm: 20
   _originMoveTime: 0.5
   _startupDelay: 0.5
   _backlashTestTiltDegrees: 1
@@ -8201,7 +8201,7 @@ MonoBehaviour:
   - 3
   - 5
   _tiltRampAllowance: 0.075
-  _balancingMoveTime: 0.1
+  _balancingMoveTime: 0.06
   _pairingSearchDegrees: 3
 --- !u!1 &1399602468
 GameObject:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using vcp = HighPrecisionStepperJuggler.OpenCVConstants.VideoCaptureProperties;
 using c = HighPrecisionStepperJuggler.Constants;
@@ -140,6 +141,24 @@ namespace HighPrecisionStepperJuggler
         // longer feeds the machine, since imgMode 6 is a debug view.
         public BallRadiusAndPosition LatestHoughBallData { get; private set; }
 
+        // Detection diagnostics. "No ball" is the least useful thing a detector can say: every
+        // cause looks identical from outside, and the machine simply sits there armed and idle.
+        // These say WHICH gate turned the candidates down, rate limited so a 120fps loop cannot
+        // flood the Console.
+        [SerializeField] private bool _logDetectionRejections = true;
+        private float _lastRejectionLogTime = -10f;
+
+        private void LogRejection(string reason)
+        {
+            if (!_logDetectionRejections || Time.realtimeSinceStartup - _lastRejectionLogTime < 1f)
+            {
+                return;
+            }
+
+            _lastRejectionLogTime = Time.realtimeSinceStartup;
+            Debug.Log("[Detect] no ball - " + reason);
+        }
+
         private BallRadiusAndPosition _lastAcceptedBall;
         private int _framesSinceBallAccepted = int.MaxValue;
 
@@ -207,6 +226,13 @@ namespace HighPrecisionStepperJuggler
 
             if (candidates == null || candidates.Count == 0)
             {
+                // Nothing even reached the shape gates, so the custom-gray image never rose above
+                // Constants.Threshold anywhere. That is an EXPOSURE or GrayMode problem, not a
+                // tuning one - no gate below can recover a blob the tracer never saw.
+                LogRejection("the border tracer found no bright cluster at all. The custom-gray "
+                             + "image is not passing Constants.Threshold (" + c.Threshold
+                             + ") anywhere - check exposure/gain and the GrayMode, not the radius "
+                             + "limits.");
                 _framesSinceBallAccepted++;
                 _pendingLockStreak = 0;
                 return false;
@@ -250,6 +276,35 @@ namespace HighPrecisionStepperJuggler
 
             if (plausible == null)
             {
+                if (_logDetectionRejections)
+                {
+                    var sb = new StringBuilder();
+                    foreach (var candidate in candidates)
+                    {
+                        sb.Append(" r=").Append(candidate.Radius.ToString("0"))
+                          .Append("/round=").Append(candidate.Roundness.ToString("0.00"));
+                    }
+
+                    // Quote the radius the ball SHOULD have at the height the plate was just
+                    // commanded to. Without it "r=163, cap 149" only says the blob is too big;
+                    // with it the same line says by how much and in which direction, which turns
+                    // this from a complaint into an exposure-tuning instrument. A round blob
+                    // (roundness ~0.90) reading well OVER the expected size is a ball blooming in
+                    // too bright an image, not a ball at the wrong height - and since the radius
+                    // IS the height measurement, accepting it would put every reported ball
+                    // height out by the same proportion.
+                    var expected = FOVCalculations.MaxPlausibleBallRadiusInPixels / 1.10f;
+
+                    LogRejection(candidates.Count + " candidate(s) found but all rejected:" + sb
+                                 + "   allowed radius " + _ht21Parameters.MinRadius + ".."
+                                 + maxRadius.ToString("0") + ", roundness >= "
+                                 + MinimumBallRoundness.ToString("0.00")
+                                 + ".  EXPECTED r=" + expected.ToString("0")
+                                 + "px at the commanded plate height. A round blob reading much "
+                                 + "LARGER than that is blooming - lower the exposure. Reading "
+                                 + "much SMALLER, or nothing at all - raise it.");
+                }
+
                 _framesSinceBallAccepted++;
                 _pendingLockStreak = 0;
                 return false;
@@ -282,6 +337,10 @@ namespace HighPrecisionStepperJuggler
 
                 if (!found)
                 {
+                    LogRejection(plausible.Count + " plausible candidate(s), but none within "
+                                 + BallTrackingGatePixels + "px of where the ball was last seen "
+                                 + "- the tracker is still locked onto the old spot. It unlocks "
+                                 + "after " + BallTrackingGateFrames + " frames.");
                     _framesSinceBallAccepted++;
                     return false;
                 }
@@ -347,10 +406,22 @@ namespace HighPrecisionStepperJuggler
                 Height = c.CameraResolutionHeight,    // 480
                 FPS = 120,                            // Measured: this camera really does stream 120fps over MSMF at its native 480x640 (see note in Start())
                 AutoExposure = 0,                     // Manual, so the driver stops re-adjusting frame to frame
+                // DO NOT COPY THE PyQt HOST'S CAMERA SETTINGS HERE. It reached -8 / 120, and that
+                // is correct FOR ITS OWN DETECTOR, which gates on HSV and wants the ball just
+                // below clipping so it keeps its saturation. This host's imgMode 7 traces a
+                // "custom gray" of RED MINUS BLUE and keeps every pixel above Constants.Threshold
+                // (70), so it wants the ball BRIGHT, not merely unclipped. Ported across on
+                // 2026-09-04 and it stopped mode 7 detecting anything at all: the tracer found no
+                // cluster, SelectBall returned its placeholder, and the machine sat armed and idle
+                // with no ball. The two detectors want different images and their camera settings
+                // are not shared.
                 Exposure = -5,                        // As per the known-good OpenCV 4.2 setup
                 Gain = 110,                           // NOT the 4.2 screenshot's 15: that was on MSMF's scale, and these are
                                                       // now written through DSHOW, whose scale differs. 110 reproduces a
-                                                      // comparable image (measured stream brightness ~114).
+                                                      // comparable image (measured stream brightness ~114). Mode 7 may want
+                                                      // brighter still - r-b peaked near 217 at this gain and the tracer is
+                                                      // happier when it saturates, so try 160-200 if [Detect] reports that
+                                                      // nothing passes Constants.Threshold.
                 Contrast = 25,                        // 4.2 value
                 Saturation = 160,                     // 4.2 value
                 Brightness = 64,                      // driver clamps at 64

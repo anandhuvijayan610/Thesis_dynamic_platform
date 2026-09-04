@@ -33,6 +33,17 @@ namespace HighPrecisionStepperJuggler
         // Time given to the plate to travel from wherever it is up to the working origin.
         [SerializeField] private float _originMoveTime = 0.5f;
 
+        [Header("Level the plate at origin")]
+        // Standing tilt of the plate at the working origin, cancelled out. Pushed into
+        // Constants.LevelTrim*Degrees in Awake() so it can be set from the inspector; see the
+        // long note on those for why this is a property of the HEIGHT and has to be re-measured
+        // whenever the origin offset moves.
+        [SerializeField] private float _levelTrimXDegrees = -2.50f;
+        [SerializeField] private float _levelTrimYDegrees = -2.10f;
+
+        // How much one press of a nudge button moves the trim.
+        [SerializeField] private float _levelTrimStepDegrees = 0.10f;
+
         // Grace period before the very first packet, so the serial link is up before we talk.
         [SerializeField] private float _startupDelay = 0.5f;
 
@@ -77,6 +88,51 @@ namespace HighPrecisionStepperJuggler
             SendInstructions(new List<HLInstruction>() {instruction});
         }
 
+        // ---- Level the plate at origin -------------------------------------------------
+        // Adjusting by eye against a spirit level is the only way this gets set, so each nudge
+        // re-sends the origin pose immediately and the plate can be watched as it settles.
+
+        public float LevelTrimX => Constants.LevelTrimXDegrees;
+        public float LevelTrimY => Constants.LevelTrimYDegrees;
+        public float LevelTrimStepDegrees => _levelTrimStepDegrees;
+
+        /// <summary>
+        /// Moves the levelling trim by one step and parks the plate on the new origin.
+        /// </summary>
+        public void NudgeLevelTrim(float xSteps, float ySteps)
+        {
+            Constants.LevelTrimXDegrees += xSteps * _levelTrimStepDegrees;
+            Constants.LevelTrimYDegrees += ySteps * _levelTrimStepDegrees;
+            _levelTrimXDegrees = Constants.LevelTrimXDegrees;
+            _levelTrimYDegrees = Constants.LevelTrimYDegrees;
+            GoToOrigin();
+        }
+
+        /// <summary>
+        /// Back to a dead-level command, so the raw standing tilt can be seen again.
+        /// </summary>
+        public void ResetLevelTrim()
+        {
+            Constants.LevelTrimXDegrees = 0f;
+            Constants.LevelTrimYDegrees = 0f;
+            _levelTrimXDegrees = 0f;
+            _levelTrimYDegrees = 0f;
+            GoToOrigin();
+        }
+
+        /// <summary>
+        /// Pushes the inspector's trim fields into Constants without moving the plate.
+        ///
+        /// Nothing here persists between runs: Constants is static and starts from its own
+        /// defaults every time the editor enters play mode, so a trim dialled in through the
+        /// buttons is lost on exit. Anything worth keeping belongs in Constants itself.
+        /// </summary>
+        public void ApplyInspectorLevelTrim()
+        {
+            Constants.LevelTrimXDegrees = _levelTrimXDegrees;
+            Constants.LevelTrimYDegrees = _levelTrimYDegrees;
+        }
+
         private void Awake()
         {
             _elapsedTime = 0f;
@@ -84,6 +140,7 @@ namespace HighPrecisionStepperJuggler
 
             // Inspector value is in mm for legibility; everything downstream works in metres.
             Constants.OriginHeightOffset = _originHeightOffsetMm / 1000f;
+            ApplyInspectorLevelTrim();
         }
 
         private void Start()
@@ -297,7 +354,23 @@ namespace HighPrecisionStepperJuggler
             // This is deliberately NOT folded into Constants.OriginMachineState: that state is the
             // firmware's zero, and InstructableMachine.Instruct() subtracts it from every target -
             // putting the offset in both places would cancel it out and the plate would never move.
-            var originOffset = new HLMachineState(Constants.OriginHeightOffset, 0f, 0f);
+            // The levelling trim rides along with the height offset, for the same reason and in
+            // the same place: this is the one chokepoint every commanded pose passes through, and
+            // applying a calibration offset per call site is how one eventually gets missed or
+            // applied twice.
+            //
+            // Added to the TARGET and deliberately not to Constants.OriginMachineState.
+            // InstructableMachine.Instruct() subtracts that state from every target, so a trim
+            // present in both places cancels itself out exactly and the plate never moves - the
+            // same trap this file already documents for the height offset.
+            //
+            // It also lands AFTER HLInstruction's tilt clamp, which is what we want: the clamp
+            // bounds what the controller may ask for, while the trim is calibration and must
+            // survive intact even when the controller is asking for full deflection.
+            var originOffset = new HLMachineState(
+                Constants.OriginHeightOffset,
+                Constants.LevelTrimXDegrees,
+                Constants.LevelTrimYDegrees);
 
             var llInstructions = instructions.Select(instruction =>
             {
