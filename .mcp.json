@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "overleaf": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@mjyoo2/overleaf-mcp"],
+      "env": {
+        "OVERLEAF_PROJECT_ID": "${OVERLEAF_PROJECT_ID}",
+        "OVERLEAF_GIT_TOKEN": "${OVERLEAF_GIT_TOKEN}"
+      }
+    }
+  }
+}

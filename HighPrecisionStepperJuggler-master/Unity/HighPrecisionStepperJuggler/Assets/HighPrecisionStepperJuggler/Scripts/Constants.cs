@@ -21,7 +21,12 @@ namespace HighPrecisionStepperJuggler
         // from the WORKING origin instead - FOVCalculations.CameraToPlateDistanceAtOrigin shifts
         // this by OriginHeightOffset, so calibrate this one at the dead position and leave the
         // offset to do its own work.
-        public static float BallHeightAtOrigin = 71.95f;
+        // 67.95, not the 71.95 this held until 2026-08-28. The calibration measured the WORKING
+        // origin plane at 69.95mm with the offset at 2mm, and a higher plate is further from the
+        // camera (see FOVCalculations.CameraToPlateDistanceAtOrigin), so the dead position is
+        // 69.95 - 2 = 67.95. The old 71.95 was 69.95 + 2, i.e. fitted around the subtraction that
+        // property used to do; both were wrong together and cancelled out at exactly 2mm of offset.
+        public static float BallHeightAtOrigin = 67.95f;
 
         // Which physical motor each computed arm rotation is sent to.
         //
@@ -64,12 +69,19 @@ namespace HighPrecisionStepperJuggler
         // Overridden at runtime from MachineController's "_originHeightOffsetMm" inspector field;
         // this value is the fallback.
         //
-        // Raising the plate moves it this much CLOSER to the down-facing camera, so the ball
-        // height model has to shift its reference plane by the same amount:
+        // Raising the plate moves it this much FURTHER from the camera, so the ball height model
+        // has to shift its reference plane by the same amount:
         // FOVCalculations.CameraToPlateDistanceAtOrigin does exactly that. BallHeightAtOrigin
-        // stays calibrated at the mechanical dead position - do not hand-subtract the offset from
-        // it as well, or it gets counted twice.
-        public static float OriginHeightOffset = 0.020f;
+        // stays calibrated at the mechanical dead position - do not hand-add the offset to it as
+        // well, or it gets counted twice.
+        //
+        // This also sets how much of the plate the camera can SEE. The visible patch is only a
+        // small window on the 299mm plate and the ball vanishes the moment it leaves it, but the
+        // window grows with distance, so height buys lateral room: +-32.5mm in X at 10mm of offset
+        // against +-45.1mm at 40mm. At the current 10mm the origin is the tightest point of the
+        // program - the room where the ball is actually moving comes from the juggling base height
+        // instead. See MachineController._originHeightOffsetMm.
+        public static float OriginHeightOffset = 0.010f;
         public const int BaudRate = 921600;
 
         // Re-calibrated 2026-08-26 after the camera mount moved. Least-squares fit of

@@ -65,11 +65,85 @@ namespace HighPrecisionStepperJuggler
 
         [SerializeField] private StrategyProgram _strategyProgram = StrategyProgram.BalancingOnly;
 
-        // How many EXTRA Bouncing+BouncingStrong pairs SmallJugglingDemo runs, on top of the one
-        // pair GetBallBouncing() always sends first. 1 means 2 pairs total - enough to read as a
-        // demo, short enough not to be a marathon. See GetBallBouncing for why it uses pairs
-        // rather than a single retuned move.
-        [SerializeField] private int _smallJugglingExtraCycles = 1;
+        [Header("Small juggling demo")]
+        // The choreography: rise to _smallJugglingBaseHeightMm above the working origin, settle the
+        // ball there, bounce it in a steady rhythm for _smallJugglingBounceSeconds while correcting
+        // tilt on every stroke, then STOP oscillating and just balance until the ball is genuinely
+        // settled on the centre, and only then step gradually down to the origin. Heights are in mm
+        // ABOVE THE WORKING ORIGIN, not above the mechanical dead position - the working origin is
+        // itself Constants.OriginHeightOffset above that.
+        // 40mm above the working origin, which with a 10mm origin puts the plate 50mm above the
+        // mechanical dead position while juggling. This is where the ball spends the whole bouncing
+        // phase, so it is what decides how much room it has to move before leaving the camera's
+        // view: +-49.2mm in X here, against +-32.5mm down at the origin.
+        [SerializeField] private float _smallJugglingBaseHeightMm = 40f;
+        [SerializeField] private float _smallJugglingOscillationMm = 25f;
+
+        // The bounce is four phases, not two - see BallControlStrategyFactory.RhythmicBouncing.
+        // Retuned 2026-08-28 after the previous single-move-time 30mm/0.10s setting shook the whole
+        // structure hard enough to throw the ball off the plate. The ball was not being lost to the
+        // hop itself (6.3mm) but to the frame vibration the motion excited.
+        //
+        // RISE - the only phase that has to be hard. Peak plate acceleration is
+        // pi^2 * rise / (2 * riseTime^2) and the ball only separates when that exceeds 1g; below it
+        // the plate carries the ball up in contact and nothing juggles. 25mm/0.10s = 1.26g, down
+        // from 1.51g, which drops the ball's launch speed 0.353 -> 0.238 m/s and the hop 6.3 -> 2.9mm.
+        // Peak step rate ~11500/s, well under this firmware's ~25000/s ISR ceiling. Do NOT set any
+        // of these times to 0.05 or below: the firmware clamps anything under MOVE_DURATION (0.05s,
+        // Constants.h) up to that floor, so asking for less silently gets you 0.05s.
+        [SerializeField] private float _smallJugglingRiseTime = 0.1f;
+
+        // TOP DWELL - sent as a move to the height the plate is already at, so it genuinely holds
+        // still. Sized to cover the ball's flight: at 1.26g it separates 0.079s into the rise and
+        // lands back about 0.03s after the rise ends, so 0.08s catches it on a stationary plate.
+        [SerializeField] private float _smallJugglingTopDwellTime = 0.08f;
+
+        // FALL - deliberately much slower than the rise. The old setting ran the fall at the rise's
+        // speed, making every cycle contain TWO 1.51g events when only the rise needs to beat 1g;
+        // the fall launches nothing, so its speed was pure structural excitation for no benefit.
+        // 25mm/0.22s = 0.26g, about six times gentler, and it keeps the ball in contact on the way
+        // down instead of flinging it.
+        [SerializeField] private float _smallJugglingFallTime = 0.22f;
+
+        // BOTTOM DWELL - quiet time for the frame to damp before the next rise, and for the ball to
+        // settle so the next cycle's tilt correction acts on a ball that is actually on the plate.
+        // With these four numbers the cycle is 0.60s (1.7Hz) against the old 0.25s (4Hz), and it
+        // contains one hard acceleration instead of two - about 79% fewer hard accelerations per
+        // second. That drop, not the smaller hop, is the part that should stop the shaking.
+        [SerializeField] private float _smallJugglingBottomDwellTime = 0.15f;
+
+        // How long the bouncing phase lasts, in seconds. Converted to a cycle count against the
+        // real cycle time (both strokes plus the firmware's 50ms margin), so changing the move time
+        // above keeps this duration honest instead of silently rescaling it.
+        [SerializeField] private float _smallJugglingBounceSeconds = 45f;
+
+        // Control cycles spent settling before the bouncing starts, and the stepped descent after
+        // the centring stage. At _balancingMoveTime each cycle is ~0.15s.
+        [SerializeField] private int _smallJugglingSettleCycles = 15;
+        [SerializeField] private int _smallJugglingDescentSteps = 4;
+        [SerializeField] private int _smallJugglingDescentCyclesPerStep = 8;
+        [SerializeField] private int _smallJugglingLandedCycles = 20;
+
+        // The centring stage that runs after the bouncing stops: balance, no oscillation, until the
+        // ball is actually settled on the target. Condition-based rather than a fixed count,
+        // because how long a ball takes to come to rest depends on how it was moving when the
+        // bouncing ended - see BalancingUntilSettledStrategy.
+        //
+        // All three conditions have to hold together for _smallJugglingCentredHoldCycles running:
+        // near the target, slow, and down on the plate. The height term is what makes it wait for
+        // the bouncing to actually die out - a ball at the apex of a bounce can otherwise sit right
+        // over the target at near-zero vertical speed and look settled for an instant.
+        //
+        // 8mm of tolerance is comfortably inside the frame: at the 20mm base the camera sees about
+        // +-30mm in X and +-42mm in Y at plate level.
+        [SerializeField] private float _smallJugglingCentredToleranceMm = 8f;
+        [SerializeField] private float _smallJugglingCentredSpeedMmPerSec = 30f;
+        [SerializeField] private float _smallJugglingCentredHeightMm = 12f;
+        [SerializeField] private int _smallJugglingCentredHoldCycles = 12;
+
+        // Backstop so a ball that never quite settles cannot hold the program here forever and
+        // starve the descent stages. ~22s at _balancingMoveTime.
+        [SerializeField] private int _smallJugglingCentredMaxCycles = 150;
 
         // How far the plate rises for a "juggle" bounce, in mm above _balancingPlateHeight, and
         // how long that one move takes. Shared by SmallJugglingDemo and the first bounce stage of
@@ -121,13 +195,20 @@ namespace HighPrecisionStepperJuggler
 
         // How long the ball may stay undetected before the strategies are disarmed. Without this
         // a lost ball simply froze the plate on its last command forever, with no way back.
-        [SerializeField] private float _ballLostTimeout = 0.35f;
+        // Raised from 0.35s: during juggling the ball is deliberately airborne for ~0.15-0.2s a
+        // bounce, and detection can legitimately drop a frame or two around the apex. 0.35s was
+        // tight enough to abort on a perfectly healthy bounce. 1s still catches a genuinely lost
+        // ball quickly while riding out the normal gaps.
+        [SerializeField] private float _ballLostTimeout = 1f;
 
-        // Where the plate parks after a lost-ball abort, in mm above the working origin. Not 0
-        // (the working origin) - a small standing height so the plate is ready to receive the ball
-        // again rather than sitting flat, and level rather than tilted from whatever correction
-        // was last in flight when the ball disappeared.
-        [SerializeField] private float _ballLostRecoveryHeightMm = 10f;
+        // Where the plate parks after a lost-ball abort, in mm above the working origin.
+        //
+        // 0 = the working origin itself, which is the right answer now that the working origin is
+        // Constants.OriginHeightOffset (20mm) above the mechanical dead position rather than the
+        // 2mm it was when this field was introduced. Back then "origin" meant essentially flat on
+        // the deck and a raised standing height was worth having; now the origin IS the raised
+        // standing height, and parking anywhere above it just leaves the plate somewhere arbitrary.
+        [SerializeField] private float _ballLostRecoveryHeightMm = 0f;
         [SerializeField] private float _ballLostRecoveryMoveTime = 0.3f;
 
         [Header("Camera -> plate axis mapping")]
@@ -346,36 +427,109 @@ namespace HighPrecisionStepperJuggler
         /// </summary>
         private void BuildSmallJugglingDemoProgram()
         {
-            _strategies.Add(BallControlStrategyFactory.GoToWhenBallOnPlate(_balancingPlateHeight));
+            var baseHeight = _smallJugglingBaseHeightMm / 1000f;
+            var topHeight = baseHeight + _smallJugglingOscillationMm / 1000f;
 
+            // 1 --------------------------------------------------- wait for the ball, then rise
+            _strategies.Add(BallControlStrategyFactory.GoToWhenBallOnPlate(baseHeight));
+
+            // 2 ------------------------------------------- settle and centre before any bouncing
+            // Worth its own stage: the oscillation below aims each hit using where the ball is
+            // going, so starting it with the ball already drifting just launches the drift.
             _strategies.Add(BallControlStrategyFactory.Balancing(
-                _balancingPlateHeight,
-                15,
+                baseHeight,
+                _smallJugglingSettleCycles,
                 _balancingTarget,
                 PIDTiltController.Instance,
                 _balancingMoveTime,
                 action: () => _machineStateView.Set("Settling",
                     MachineStateView.TiltControlType.PIDTiltController)));
 
-            // Was a single custom Bouncing() call tuned from first-principles physics. Confirmed
-            // by the user NOT to separate the ball even after two escalations (0.87g, then 2.79g
-            // commanded) - meanwhile FullJugglingDemo, which interleaves Bouncing() with
-            // BouncingStrong() via GetBallBouncing(), DOES work. Since Bouncing()'s own amplitude
-            // is shared and identical in both places (see GetBallBouncing below), the working part
-            // has to be BouncingStrong() - its lowPos/highPos were never broken by the dead-
-            // parameter bug and were left at their own larger, independently-working values. Rather
-            // than keep guessing new physics numbers for Bouncing() alone, this now calls the exact
-            // same GetBallBouncing() pairing FullJugglingDemo already proved works on the real
-            // machine, just bounded to far fewer cycles so it reads as a short demo.
-            GetBallBouncing(
-                () => _machineStateView.Set("Small Juggling Demo",
-                    MachineStateView.TiltControlType.PIDTiltController),
-                extraCycles: _smallJugglingExtraCycles);
+            // 3 ------------------------------------------------------------------- the juggling
+            // Bouncing() sends the up-stroke WITH the tilt correction applied and the down-stroke
+            // level, so the ball is being aimed back toward the target on every single bounce -
+            // this one stage is both the oscillation and the balancing, not two competing things.
+            //
+            // AnalyticalTiltController, not PID: PID only knows where the ball IS, which is the
+            // wrong question for a ball that spends part of each cycle in the air. The analytical
+            // one uses BallData.AirborneTime and the predicted bounce velocity to aim at where the
+            // ball will LAND. (AirborneTime is internally clamped to >=0.1s, so the very first
+            // bounce - before any flight has been measured - cannot divide by zero.)
+            // Cycle time is all four phases plus the 50ms microcontroller margin
+            // MachineController.SendInstructions adds - counted FOUR times, because the phases go
+            // out as four separate sends so the tilt can be recomputed on each one (see
+            // RhythmicBouncing). That is what actually paces the rhythm, so deriving the count from
+            // it keeps the phase at the requested number of seconds whatever the four times are.
+            var bounceCycleSeconds = _smallJugglingRiseTime + _smallJugglingTopDwellTime
+                                     + _smallJugglingFallTime + _smallJugglingBottomDwellTime
+                                     + 4f * 0.05f;
+            var bounceCycles = Mathf.Max(1, Mathf.RoundToInt(_smallJugglingBounceSeconds / bounceCycleSeconds));
 
-            // Parks at the SAME height as a ball-lost abort (_ballLostRecoveryHeightMm), not
-            // _balancingPlateHeight (50mm) or the working origin - one consistent "resting" height
-            // for every way the demo can end, rather than a different one depending on how it ended.
-            _strategies.Add(BallControlStrategyFactory.GoTo(_ballLostRecoveryHeightMm / 1000f,
+            // PID, not Analytical: the ball has to be steered by where it IS and how fast it is
+            // moving, which is what keeps it on the centre through the bounce. AnalyticalTiltController
+            // models a paddle redirecting a ball in real flight and saturates the tilt on this
+            // gentle ~3mm hop - see the note on RhythmicBouncing. Same controller and same target as
+            // the balancing stages, so the ball is held to the same place throughout the program.
+            _strategies.Add(BallControlStrategyFactory.RhythmicBouncing(
+                bounceCycles,
+                PIDTiltController.Instance,
+                _balancingTarget,
+                lowPos: baseHeight,
+                highPos: topHeight,
+                riseTime: _smallJugglingRiseTime,
+                topDwellTime: _smallJugglingTopDwellTime,
+                fallTime: _smallJugglingFallTime,
+                bottomDwellTime: _smallJugglingBottomDwellTime,
+                action: () => _machineStateView.Set("Juggling",
+                    MachineStateView.TiltControlType.PIDTiltController)));
+
+            // 4 ------------------------------------------- oscillation stops, balancing continues
+            // The plate now holds one height and only tilts, so the ball drops out of its bounce
+            // and is steered to the centre. Ends when the ball is genuinely settled there rather
+            // than after a set time, so the descent below always starts from a ball at rest.
+            _strategies.Add(BallControlStrategyFactory.BalancingUntilSettled(
+                baseHeight,
+                _balancingTarget,
+                PIDTiltController.Instance,
+                _smallJugglingCentredToleranceMm,
+                _smallJugglingCentredSpeedMmPerSec,
+                _smallJugglingCentredHeightMm,
+                _smallJugglingCentredHoldCycles,
+                _smallJugglingCentredMaxCycles,
+                _balancingMoveTime,
+                action: () => _machineStateView.Set("Centering",
+                    MachineStateView.TiltControlType.PIDTiltController)));
+
+            // 5 ------------------------------------------------- gradual descent to the origin
+            // Stepped, with a Balancing stage per step, so the controller keeps correcting the
+            // ball the whole way down instead of going open-loop for the descent. The steps are
+            // small (baseHeight/steps = 5mm at the defaults) and run at _balancingMoveTime, which
+            // keeps every one of them far below 1g - the opposite of what stage 3 is deliberately
+            // doing, so the descent cannot accidentally toss the ball it just caught.
+            for (int step = _smallJugglingDescentSteps - 1; step >= 1; step--)
+            {
+                var stepHeight = baseHeight * step / _smallJugglingDescentSteps;
+                var isFirstStep = step == _smallJugglingDescentSteps - 1;
+
+                _strategies.Add(BallControlStrategyFactory.Balancing(
+                    stepHeight,
+                    _smallJugglingDescentCyclesPerStep,
+                    _balancingTarget,
+                    PIDTiltController.Instance,
+                    _balancingMoveTime,
+                    action: isFirstStep
+                        ? () => _machineStateView.Set("Descending",
+                            MachineStateView.TiltControlType.PIDTiltController)
+                        : (Action)null));
+            }
+
+            // 6 ------------------------------------- arrive at the origin and hold, still balancing
+            _strategies.Add(BallControlStrategyFactory.Balancing(
+                0f,
+                _smallJugglingLandedCycles,
+                _balancingTarget,
+                PIDTiltController.Instance,
+                _balancingMoveTime,
                 action: () => _machineStateView.Set("Landed",
                     MachineStateView.TiltControlType.PIDTiltController)));
         }

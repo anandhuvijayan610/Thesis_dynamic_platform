@@ -165,6 +165,15 @@ namespace HighPrecisionStepperJuggler
         private BallRadiusAndPosition _pendingLock;
         private int _pendingLockStreak;
 
+        // Lowest roundness (see BallRadiusAndPosition.Roundness) still accepted as possibly a ball.
+        // Set between the two clusters rather than close to either: a perfect digital circle scores
+        // ~0.90 and an elongated band ~0.64, so 0.72 sits in the gap with room on both sides for a
+        // ragged real-world edge. Not higher, because a ball touching the frame edge traces a
+        // crescent that scores ~0.77 - those are handled by the separate _ballFullyVisible check in
+        // ImageProcessingInstructionSender, which knows the difference between "not the ball" and
+        // "the ball, but do not trust its centre".
+        private const float MinimumBallRoundness = 0.72f;
+
         /// <summary>
         /// Chooses which detected blob is actually the ball.
         ///
@@ -205,10 +214,28 @@ namespace HighPrecisionStepperJuggler
 
             List<BallRadiusAndPosition> plausible = null;
 
+            // Tightens around the commanded plate height, so it is far more selective than the
+            // static MaxRadius backstop: ~181px while the plate is at the 20mm juggling base,
+            // against MaxRadius's flat 260. Min() so neither gate can ever be loosened by the other.
+            var maxRadius = Mathf.Min(_ht21Parameters.MaxRadius, FOVCalculations.MaxPlausibleBallRadiusInPixels);
+
             foreach (var candidate in candidates)
             {
                 if (candidate.Radius < _ht21Parameters.MinRadius ||
-                    candidate.Radius > _ht21Parameters.MaxRadius)
+                    candidate.Radius > maxRadius)
+                {
+                    continue;
+                }
+
+                // Shape gate, independent of size - which matters because the size gate above cannot
+                // be tight at every height. When the plate is low the ball is genuinely huge (223px
+                // at the origin) and the cap has to admit blobs that big, so background clutter of a
+                // similar size gets through on size alone. Roundness does not care how big the blob
+                // is, only whether it could be a sphere.
+                //
+                // 0 means the candidate came from a path that does not measure it (HoughCircles) -
+                // skip the gate rather than reject, or that path would never return a ball at all.
+                if (candidate.Roundness > 0f && candidate.Roundness < MinimumBallRoundness)
                 {
                     continue;
                 }
@@ -365,17 +392,19 @@ namespace HighPrecisionStepperJuggler
                                    // If the lighting degrades again, try 1 then 2 - see the note on the field.
                 MinRadius = 28,    // NOT the 4.2 screenshot's 100: that would reject the ball near the 200mm apex, where it
                                    // is only ~34px. Measured identical accuracy and rate at 28, so 28 keeps the full flight range.
-                MaxRadius = 260    // Raised from 200 when the working origin moved to 20mm above the
-                                   // mechanical dead position: the ball now RESTS at ~223px (camera only
-                                   // ~52mm away), which the old 200 cap rejected outright. 260 gives real
-                                   // margin over that, same margin-over-worst-case spirit as the original
-                                   // 200 had over its own 168px rest point.
-                                   // Affects more than the imgMode 6 debug view now: UVCCameraPlugin's own
-                                   // SelectBall() also uses this as a plausibility filter on EVERY imgMode's
-                                   // candidates (added when it also started rejecting the ceiling as "the
-                                   // ball") - so this is now a real gate on what imgMode 7 hands the
-                                   // machine, not just cosmetic. Re-check this number if the origin offset
-                                   // changes again - see FOVCalculations.CameraToPlateDistanceAtOrigin.
+                MaxRadius = 200    // Back to 200 on 2026-08-28, from the 260 it was briefly raised to.
+                                   // That raise was made to clear a "223px at rest" figure that was never
+                                   // measured - it came from FOVCalculations' reference plane, which had
+                                   // the sign of OriginHeightOffset backwards at the time and so put the
+                                   // plate 36mm closer to the camera than it really is. With the sign
+                                   // fixed and the origin at 40mm the ball never exceeds ~111px, and the
+                                   // widening turns out to have been the thing that let big ceiling blobs
+                                   // into SelectBall's candidate set.
+                                   //
+                                   // This is only a STATIC backstop either way. The real size gate is
+                                   // FOVCalculations.MaxPlausibleBallRadiusInPixels, which tightens frame
+                                   // by frame around the height the plate has actually been commanded to;
+                                   // tune that rather than this.
             };
         }
 
@@ -956,5 +985,12 @@ namespace HighPrecisionStepperJuggler
         public float Radius;
         public float PositionX;
         public float PositionY;
+
+        // Border length against that of a circle with the same radius - see the derivation in
+        // ImageProcessing.BallDataFromPixelBoarders, which is the only thing that sets it. A perfect
+        // digital circle scores ~0.90 and a long thin band ~0.64. Left at 0 by the HoughCircles path
+        // in UVCCameraPlugin, which has no border to measure; SelectBall treats 0 as "not measured"
+        // and skips the shape gate rather than rejecting it.
+        public float Roundness;
     }
 }

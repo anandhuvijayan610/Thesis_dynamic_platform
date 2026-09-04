@@ -9,7 +9,7 @@ namespace HighPrecisionStepperJuggler
     {
         private List<Vector2Int> _positiveProbePoints;
         private List<Vector2Int> _boarderPixelPositions;
-        private List<(Vector2Int center, float radius)> _detectedObjects;
+        private List<(Vector2Int center, float radius, float roundness)> _detectedObjects;
 
         private Vector2Int[] _cyclePattern1 = new Vector2Int[]
         {
@@ -111,7 +111,7 @@ namespace HighPrecisionStepperJuggler
         {
             _positiveProbePoints = new List<Vector2Int>(200);
             _boarderPixelPositions = new List<Vector2Int>(20000);
-            _detectedObjects = new List<(Vector2Int center, float radius)>();
+            _detectedObjects = new List<(Vector2Int center, float radius, float roundness)>();
         }
 
         public List<BallRadiusAndPosition> BallDataFromPixelBoarders(Color32[] pixels)
@@ -227,11 +227,28 @@ namespace HighPrecisionStepperJuggler
                             accumulatedRadius += dataPoint.radius;
                         }
 
+                        var meanRadius = accumulatedRadius / biggestHalf.Count;
+
+                        // How round this blob is, from data already collected: the traced border
+                        // length against the border length a circle of the same radius would have.
+                        // Radius here is half the longest chord, so an elongated shape gets a radius
+                        // set by its LENGTH while its border stays short relative to that - which is
+                        // what separates the two cases.
+                        //
+                        // The trace counts every step as 1 whether it moves straight or diagonally,
+                        // so it undercounts a true circle's perimeter: ~5.66r of steps against
+                        // 2*pi*r = 6.28r, i.e. a perfect digital circle scores ~0.90, not 1.0. A
+                        // square also lands at ~0.90 (4s of border, radius s*sqrt(2)/2). A long thin
+                        // band scores ~0.64 (2L of border, radius L/2) - which is what the ceiling
+                        // structures in this rig's background look like to the tracer.
                         _detectedObjects.Add(
                             (new Vector2Int(
                                     Mathf.RoundToInt(accumulatedCenter.x / (float) biggestHalf.Count),
                                     Mathf.RoundToInt(accumulatedCenter.y / (float) biggestHalf.Count)),
-                                accumulatedRadius / biggestHalf.Count));
+                                meanRadius,
+                                meanRadius > 0.5f
+                                    ? _boarderPixelPositions.Count / (2f * Mathf.PI * meanRadius)
+                                    : 0f));
 
                         break;
                     }
@@ -255,7 +272,8 @@ namespace HighPrecisionStepperJuggler
                 {
                     Radius = data.radius,
                     PositionX = -data.center.x + c.FrameWidth / 2f,
-                    PositionY = -data.center.y + c.FrameHeight / 2f
+                    PositionY = -data.center.y + c.FrameHeight / 2f,
+                    Roundness = data.roundness
                 })
                 .ToList();
         }

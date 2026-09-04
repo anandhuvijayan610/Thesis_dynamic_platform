@@ -12,7 +12,23 @@ namespace HighPrecisionStepperJuggler
 
         // How far above the mechanical dead position the working origin sits. Pushed into
         // Constants.OriginHeightOffset in Awake() so it can be tuned from the inspector in mm.
-        [SerializeField] private float _originHeightOffsetMm = 20f;
+        // 10mm. This is a DETECTION setting as much as a mechanical one: the camera sees only a
+        // small patch of the 299mm plate and the ball is simply invisible once it leaves it, but
+        // because a higher plate sits further from the camera, height buys lateral room in
+        // proportion. At this offset the plate-at-origin window is +-32.5mm in X / +-45.4mm in Y.
+        //
+        // That makes the origin the TIGHTEST point of the whole program, which is fine because the
+        // ball is meant to be settled and centred by the time the plate gets back down here - the
+        // room where the ball is actually moving comes from the juggling base height instead
+        // (_smallJugglingBaseHeightMm, 40mm, giving +-49.2mm). Raise this again if the ball is
+        // being lost during the Landed stage specifically.
+        //
+        // Ceiling: the program reaches 75mm above the mechanical dead position at the juggling
+        // apex. FullJugglingDemo already commands 80mm above the working origin and works, so this
+        // is inside known-good travel. Note the MinPlateHeight/MaxPlateHeight clamp in HLInstruction
+        // is in mm while heights are passed in metres, so it never actually fires - do not rely on
+        // it to catch an over-tall command.
+        [SerializeField] private float _originHeightOffsetMm = 10f;
 
         // Time given to the plate to travel from wherever it is up to the working origin.
         [SerializeField] private float _originMoveTime = 0.5f;
@@ -290,6 +306,22 @@ namespace HighPrecisionStepperJuggler
                         new HLInstruction(_levelingOffset + originOffset, 0f, instruction.IsLevelingInstruction);
                 return i.Translate();
             }).ToList();
+
+            // Tell the height model where the plate is being sent, so ball detection can reject
+            // blobs that are physically too large to be a ball at this height - see
+            // FOVCalculations.MaxPlausibleBallRadiusInPixels. Published here because this is the one
+            // chokepoint every commanded height passes through, and in HIGH-LEVEL mm above the
+            // working origin, which is the same reference RadiusToDistance reports heights in.
+            //
+            // The LOWEST height in the list, not the last: a list can be a multi-leg move (the
+            // juggling strategies send an up-stroke and a down-stroke as one pair), and the plate
+            // visits every leg. The lowest leg is the one that puts the plate closest to the camera,
+            // which is what bounds how large the ball can possibly look while the list is executing.
+            if (instructions.Count > 0)
+            {
+                var lowestHeight = instructions.Min(instruction => instruction.TargetHLMachineState.Height);
+                FOVCalculations.ReportCommandedPlateHeight(lowestHeight * 1000f);
+            }
 
             _totalMoveTime = 0f;
             _elapsedTime = 0f;
