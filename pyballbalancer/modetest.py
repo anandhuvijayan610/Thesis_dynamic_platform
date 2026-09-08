@@ -8,6 +8,7 @@ time, and the plate creeps upward at a few mm/s while the log looks perfect.
 """
 from __future__ import annotations
 
+import math
 import sys
 
 import machine
@@ -162,6 +163,168 @@ def test_juggling() -> None:
     check("tilt is applied on every phase, contact phases included",
           all(c.allow_tilt for c in seen))
     check("a full cycle was counted", r.cycles >= 1, "%d" % r.cycles)
+
+
+def test_juggle_supervision() -> None:
+    """Juggling must stop when the ball is gone, or drifting out of frame."""
+    print("\nJuggling supervision")
+    r, p = runner(mod_jug_low=20.0, mod_jug_high=45.0, mod_rise_time=0.8,
+                  mod_settle_time=0.5, mod_jug_centre_hold=2,
+                  mod_jug_lost_seconds=0.4, mod_jug_keep_mm=30.0)
+    r.start(modes.JUGGLING, now=0.0)
+
+    def run(seconds, ball, t0):
+        out, t = [], t0
+        while t < t0 + seconds:
+            c = r.command(t, state=ball)
+            if c is not None:
+                out.append((r.phase, c.height_m, c.move_time))
+            t += 0.005
+        return out, t
+
+    centred = Ball(0.0, 0.0)
+    r.command(0.0, state=centred)                       # the rise
+    _, t = run(2.0, centred, 1.31)
+    check("it is juggling to begin with", "rise" in r.phase or "dwell" in r.phase
+          or "fall" in r.phase, r.phase)
+
+    # --- the ball vanishes -------------------------------------------------
+    seen, t = run(1.5, None, t)
+    check("losing the ball suspends the throwing",
+          "suspended" in r.phase, r.phase)
+    check("and it keeps saying why for as long as it is stopped",
+          "not seen" in r.phase, r.phase)
+    low = 0.030
+    check("it holds at the bottom of the stroke, not the top",
+          all(abs(h - low) < 1e-9 for _p, h, _m in seen[-6:]),
+          str(sorted({round(h * 1000) for _p, h, _m in seen[-6:]})))
+
+    # It must not come down from the top at the balancing move time: 16mm in
+    # 0.06s is about 2.2g and drops the plate out from under the ball. Find the
+    # command that actually made the transition, not the first of the window -
+    # the ball has to be missing for mod_jug_lost_seconds before anything
+    # changes, so the early commands here are still ordinary juggling.
+    handover = next((c for c in seen if "suspended" in c[0]), None)
+    check("the transition is announced", handover is not None)
+    if handover is not None:
+        check("and comes down gently rather than dropping 2 g",
+              abs(handover[1] - low) < 1e-9
+              or handover[2] >= p.get("mod_jug_fall_time") - 1e-9,
+              "to %.0f mm over %.3f s" % (handover[1] * 1000, handover[2]))
+
+    # --- the ball comes back -----------------------------------------------
+    # While centring it must use the gains that STOP a ball, not the ones that
+    # juggle it. A circling ball keeps a roughly constant speed and so never
+    # satisfies the "slow enough" half of the test - 13.8 s of orbiting in a
+    # real run, never once settling.
+    check("centring swaps in the resting gains",
+          abs(p.get("pid_kd_x") - p.get("mod_rest_kd")) < 1e-9
+          and p.get("ctl_vel_window") == p.get("mod_rest_window"),
+          "kd %.3f window %d" % (p.get("pid_kd_x"), p.get("ctl_vel_window")))
+
+    _, t = run(1.5, centred, t)
+    check("it resumes juggling once the ball is back and settled",
+          "suspended" not in r.phase and "centring" not in r.phase, r.phase)
+    check("and puts the juggling gains straight back",
+          abs(p.get("pid_kd_x") - 0.040) < 1e-9 and p.get("ctl_vel_window") == 6,
+          "kd %.3f window %d" % (p.get("pid_kd_x"), p.get("ctl_vel_window")))
+
+    # --- the ball drifts toward the frame edge -----------------------------
+    import optics
+    scale = optics.px_per_mm(p.get("mac_origin_offset") + p.get("mod_jug_low"))
+    far = Ball(35.0 * scale, 0.0)          # 35mm out, past the 30mm limit
+    _, t = run(1.5, far, t)
+    check("drifting out of frame suspends it too", "suspended" in r.phase, r.phase)
+    check("and it says how far out the ball is", "out of frame" in r.phase, r.phase)
+
+    # Hysteresis: still out at 20mm, which is inside the suspend limit but
+    # outside the resume limit, so it must NOT start throwing again yet.
+    _, t = run(1.5, Ball(20.0 * scale, 0.0), t)
+    check("it does not resume until the ball is properly centred again",
+          "suspended" in r.phase or "centring" in r.phase, r.phase)
+
+    _, t = run(1.5, centred, t)
+    check("and does resume once it is", "suspended" not in r.phase
+          and "centring" not in r.phase, r.phase)
+
+    r.stop()
+    check("stopping leaves the user's gains as they were",
+          abs(p.get("pid_kd_x") - 0.040) < 1e-9 and p.get("ctl_vel_window") == 6,
+          "kd %.3f window %d" % (p.get("pid_kd_x"), p.get("ctl_vel_window")))
+
+
+def test_routine() -> None:
+    """The choreography: does the target actually go where the script says?"""
+    print("\nJuggle routine")
+    r, p = runner(mod_rise_time=0.8, mod_settle_time=0.5,
+                  mod_rou_warmup_cycles=2, mod_rou_leg_cycles=1,
+                  mod_rou_walk_mm=20.0, mod_rou_circle_mm=15.0,
+                  mod_rou_circle_points=4, mod_rou_circle_cycles=1,
+                  mod_rou_settle_cycles=2)
+    p.set("ctl_target_x", 7.0)          # something to restore later
+    p.set("ctl_target_y", -3.0)
+    r.start(modes.ROUTINE, now=0.0)
+
+    ball = Ball(0.0, 0.0)
+    t, seen = 0.0, []
+    for _ in range(4000):
+        c = r.command(t, state=ball)
+        if c is not None:
+            seen.append((r.phase, p.get("ctl_target_x"), p.get("ctl_target_y")))
+        t += 0.005
+
+    stages = []
+    for phase, tx, ty in seen:
+        head = phase.split(" - ")[0]
+        if not stages or stages[-1][0] != head:
+            stages.append((head, tx, ty))
+    names = [s[0] for s in stages]
+
+    check("it warms up on the centre first",
+          any(n.startswith("warming up") for n in names)
+          and all(abs(x) + abs(y) < 1e-9 for n, x, y in stages
+                  if n.startswith("warming up")), str(names[:3]))
+    check("then walks", any(n.startswith("walking") for n in names))
+    check("then circles", any(n.startswith("circle") for n in names))
+    check("then settles", any(n.startswith("settling") for n in names))
+    check("and finally lands", any(n.startswith("landed") for n in names),
+          str(names[-2:]))
+
+    order = [names.index(k) for k in
+             (next(n for n in names if n.startswith("warming")),
+              next(n for n in names if n.startswith("walking")),
+              next(n for n in names if n.startswith("circle")),
+              next(n for n in names if n.startswith("settling")),
+              next(n for n in names if n.startswith("landed")))]
+    check("in that order", order == sorted(order), str(order))
+
+    walk = [(x, y) for n, x, y in stages if n.startswith("walking")]
+    reach = max(max(abs(x), abs(y)) for x, y in walk)
+    check("the walk reaches both axes",
+          any(abs(x) > 1 for x, y in walk) and any(abs(y) > 1 for x, y in walk))
+    # 20 mm at the juggling base, converted through the camera model
+    import optics
+    want = 20.0 * optics.px_per_mm(p.get("mac_origin_offset")
+                                   + p.get("mod_jug_low"))
+    check("and reaches the distance asked for, in pixels",
+          abs(reach - want) < 1.0, "%.0f px, want %.0f" % (reach, want))
+
+    circle = [(x, y) for n, x, y in stages if n.startswith("circle")]
+    radii = [math.hypot(x, y) for x, y in circle]
+    want_r = 15.0 * optics.px_per_mm(p.get("mac_origin_offset")
+                                     + p.get("mod_jug_low"))
+    check("every circle point is the same distance out",
+          max(radii) - min(radii) < 1.0 and abs(max(radii) - want_r) < 1.0,
+          "%.0f..%.0f px, want %.0f" % (min(radii), max(radii), want_r))
+
+    check("it lands on the centre, not mid-throw",
+          abs(p.get("ctl_target_x")) < 1e-9 and abs(p.get("ctl_target_y")) < 1e-9)
+
+    r.stop()
+    check("stopping restores the target the user had",
+          abs(p.get("ctl_target_x") - 7.0) < 1e-9
+          and abs(p.get("ctl_target_y") + 3.0) < 1e-9,
+          "%.1f, %.1f" % (p.get("ctl_target_x"), p.get("ctl_target_y")))
 
 
 def test_balance_then_rest() -> None:
@@ -354,6 +517,8 @@ if __name__ == "__main__":
     test_idle()
     test_balancing()
     test_balancing_height_tracks_origin()
+    test_juggle_supervision()
+    test_routine()
     test_balance_then_rest()
     test_balance_and_juggle()
     test_juggling()

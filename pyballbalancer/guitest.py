@@ -343,6 +343,15 @@ panel.serial = real_serial
 win.params.set("ctl_max_tilt", 3.0)
 check("max tilt clamp stored", win.params.get("ctl_max_tilt") == 3.0)
 
+# The mode dropdown is the only control that can select a mode, and it used to
+# be built from a list written out a second time in gui.py. A fifth mode added
+# to params.py was therefore invisible: present, tested, and unreachable. This
+# asserts the control offers exactly what the parameter allows.
+_offered = [win.cmb_mode.itemText(i) for i in range(win.cmb_mode.count())]
+_allowed = list(SPEC_BY_KEY["mod_mode"].choices)
+check("every mode in the spec is offered in the dropdown", _offered == _allowed,
+      "%s vs %s" % (_offered, _allowed))
+
 # preset round trip through the live window
 import tempfile                                                    # noqa: E402
 preset = os.path.join(tempfile.gettempdir(), "bb_gui_preset.json")

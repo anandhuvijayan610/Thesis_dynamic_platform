@@ -54,7 +54,7 @@ class MachinePanel(QWidget):
         layout.addWidget(park)
 
         # -- levelling trim ----------------------------------------------
-        trim = QGroupBox("Level the plate at origin")
+        trim = QGroupBox("Level the plate where the loop works")
         tg = QGridLayout(trim)
         tg.addWidget(QLabel("X"), 0, 0)
         self._button_grid(tg, 0, 1, "−", lambda: self._nudge_trim("x", -1))
@@ -66,13 +66,19 @@ class MachinePanel(QWidget):
         self.lbl_trim.setStyleSheet("font-family:Consolas;font-size:12px;")
         tg.addWidget(self.lbl_trim, 0, 3, 2, 1)
         self._button_grid(tg, 2, 0, "Reset trim to zero", self._zero_trim, span=2)
-        self._button_grid(tg, 2, 2, "Re-send origin", self.go_origin, span=2)
+        self._button_grid(tg, 2, 2, "Re-send level pose", self.go_trim_height, span=2)
         hint = QLabel(
-            "Each nudge re-sends the origin pose, so adjust with a spirit "
-            "level on the plate and watch it settle. The offset is then added "
-            "to every command, including the control loop's, so a level plate "
-            "here means the controller's zero is the real zero. Trim X first: "
-            "tilting one pair changes how level the other looks.")
+            "Each nudge holds the plate at the LEVELLING HEIGHT and re-sends "
+            "it, so put the ball on the plate and adjust until it stays put "
+            "rather than rolling. The ball is the instrument here, not a "
+            "spirit level.\n\n"
+            "Level at the height the loop actually works at, not at the "
+            "origin. The trim on this rig is a property of the height — the "
+            "linkage slope changes along its travel — and levelling at the "
+            "origin left the ball orbiting 25 mm off centre once the plate "
+            "rose to the juggling height, with the controller stuck at 98% of "
+            "its tilt limit and juggling unable to resume.\n\n"
+            "Trim X first: tilting one pair changes how level the other looks.")
         hint.setWordWrap(True)
         hint.setStyleSheet("color:#888;font-size:10px;")
         tg.addWidget(hint, 3, 0, 1, 4)
@@ -173,7 +179,7 @@ class MachinePanel(QWidget):
         step = self.params.get("mac_trim_step")
         self.params.set(key, self.params.get(key) + sign * step)
         self.refresh_trim()
-        self.go_origin()
+        self.go_trim_height()
 
     def _zero_trim(self) -> None:
         self.params.set("mac_trim_x", 0.0)
@@ -182,9 +188,11 @@ class MachinePanel(QWidget):
         self.go_origin()
 
     def refresh_trim(self) -> None:
-        self.lbl_trim.setText("X %+.2f°\nY %+.2f°"
+        self.lbl_trim.setText("X %+.2f°\nY %+.2f°\nat %.0f mm"
                               % (self.params.get("mac_trim_x"),
-                                 self.params.get("mac_trim_y")))
+                                 self.params.get("mac_trim_y"),
+                                 self.params.get("mac_origin_offset")
+                                 + self.params.get("mac_trim_height")))
 
     def _origin_m(self) -> float:
         return self.params.get("mac_origin_offset") / 1000.0
@@ -232,6 +240,22 @@ class MachinePanel(QWidget):
     def go_origin(self) -> None:
         self._send([(self._origin_m(), 0.0, 0.0, self._move_time())],
                    "origin — level at the working offset")
+
+    def go_trim_height(self) -> None:
+        """Hold the plate where the control loop actually runs, and level there.
+
+        Not the origin. The origin is the one height the ball is never under
+        control at - balancing runs 30 mm above it, juggling 35 mm above it -
+        and on this machine the trim is a property of the HEIGHT, because the
+        linkage carries a residual slope that changes along its travel.
+        Levelled at the origin, the ball at the juggling height orbited a point
+        25 mm off centre while the loop sat at 98% of its tilt limit, and
+        juggling could never resume because the ball was never still.
+        """
+        height = self._origin_m() + self.params.get("mac_trim_height") / 1000.0
+        self._send([(height, 0.0, 0.0, self._move_time())],
+                   "levelling pose — %.0f mm above the working origin"
+                   % self.params.get("mac_trim_height"))
 
     def ping(self) -> None:
         if self.serial.is_open:

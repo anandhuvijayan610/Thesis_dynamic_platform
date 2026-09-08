@@ -414,6 +414,23 @@ SPECS: List[Spec] = [
              "return to - measure it. Trim X first: a tilt on one pair changes "
              "how level the other pair looks, so the second axis has to be set "
              "after the first, not alongside it."),
+    Spec("mac_trim_height", "Level at height (mm)", "Machine", "float",
+         35.0, 0.0, 70.0, 1.0,
+         tip="Height ABOVE THE WORKING ORIGIN that the levelling buttons hold "
+             "the plate at while you trim.\n\n"
+             "It used to level at the origin, and that was close to useless: "
+             "the origin is the one height the ball is never controlled at. "
+             "Balancing runs 30 mm above it and juggling 35 mm above it, and on "
+             "this rig the trim is a property of the HEIGHT, not of the machine "
+             "- the linkage carries a residual slope that changes along its "
+             "travel. A 10 mm change of working origin has moved the trim by "
+             "more than a degree.\n\n"
+             "Measured consequence of getting this wrong: with the plate level "
+             "at the origin, the ball at the juggling height orbited a point "
+             "25 mm off centre while the controller sat at 98% of its tilt "
+             "limit, and juggling never resumed because the ball was never "
+             "still. Level where the loop actually works.\n\n"
+             "35 mm is the juggling base. Use 30 for balancing."),
     Spec("mac_trim_step", "Trim nudge (deg)", "Machine", "float", 0.10, 0.01, 1.0, 0.01,
          tip="How much each nudge button moves the trim."),
 
@@ -432,7 +449,7 @@ SPECS: List[Spec] = [
     # ----------------------------------------------------------------------
     Spec("mod_mode", "Mode", "Modes", "choice", "Juggling",
          choices=("Balancing", "Balance then rest", "Balance and juggle",
-                  "Juggling"),
+                  "Juggling", "Juggle routine"),
          tip="Started and stopped from the Session tab. 'Balance then rest' "
              "holds the ball a while then softens the gains so it stops in the "
              "middle. 'Balance and juggle' holds it centred and throws a small "
@@ -525,6 +542,64 @@ SPECS: List[Spec] = [
              "is 0.53 s, and that alone left a 57 mm swing. Read every window "
              "in this application as samples divided by 30."),
 
+    # ---------------------------------------------------------------- routine
+    # A staged choreography rather than one steady juggle, modelled on the Unity
+    # host's Full Juggling Demo: warm up, walk the ball side to side, trace a
+    # circle, re-settle, land.
+    #
+    # It is NOT a port of that demo's mechanism. Unity aims each individual
+    # bounce, which needs the ball's measured height and time of flight; this
+    # host measures neither. What it does have is a juggle cycle that already
+    # works and a PID loop that already holds a target, so the routine keeps the
+    # proven cycle running unchanged and moves the TARGET instead. The
+    # choreography is the same shape; the way the ball is persuaded to follow it
+    # is not.
+    Spec("mod_rou_warmup_cycles", "Warm-up cycles", "Modes", "int", 8, 0, 200, 1,
+         tip="Cycles juggling on the centre before the target starts moving, so "
+             "the ball is in a steady rhythm before it is asked to travel."),
+    Spec("mod_rou_walk_mm", "Walk to (mm)", "Modes", "float", 20.0, 0.0, 45.0, 1.0,
+         tip="How far either side of centre the walking legs reach. The camera "
+             "sees only about +-51 mm of plate at the juggling base, so 20 mm "
+             "leaves 31 mm of margin before the ball is simply invisible. The "
+             "Unity demo walks to 40 mm, which on this rig is close enough to "
+             "the edge that it loses the ball there."),
+    Spec("mod_rou_leg_cycles", "Cycles per leg", "Modes", "int", 6, 1, 100, 1,
+         tip="How long the target rests at each waypoint - about 3 s at the "
+             "shipped cycle. The ball has to actually arrive before the target "
+             "moves on, or the routine only drags it around."),
+    Spec("mod_rou_circle_mm", "Circle radius (mm)", "Modes", "float", 15.0, 0.0, 45.0, 1.0,
+         tip="Smaller than the walk, because a circle visits every direction "
+             "including the short camera axis, which runs out first."),
+    Spec("mod_rou_circle_points", "Points round the circle", "Modes", "int", 8, 3, 36, 1,
+         tip="The circle is walked as a polygon; this is how many corners."),
+    Spec("mod_rou_circle_cycles", "Cycles per point", "Modes", "int", 2, 1, 50, 1,
+         tip="Held at each corner. Fewer than a walking leg, because the step "
+             "between neighbouring corners is much shorter."),
+    Spec("mod_rou_settle_cycles", "Re-settle cycles", "Modes", "int", 8, 0, 200, 1,
+         tip="Back on the centre at the end, to bring the ball to rest before "
+             "the plate comes down."),
+    Spec("mod_jug_lost_seconds", "Give up after (s)", "Modes", "float",
+         0.4, 0.05, 5.0, 0.05,
+         tip="No ball for this long and the oscillation stops, dropping back to "
+             "balancing at the bottom of the stroke until it can be seen and "
+             "settled again. Not instant: detection drops the odd frame and the "
+             "ball is airborne 13% of each cycle, so a single miss means "
+             "nothing. Throwing a ball you cannot see is the one thing the "
+             "machine should never do - it was juggling an empty plate for four "
+             "seconds in a recorded run before this existed."),
+    Spec("mod_jug_keep_mm", "Suspend beyond (mm)", "Modes", "float",
+         30.0, 5.0, 60.0, 1.0,
+         tip="How far from the middle the ball may drift before the throwing "
+             "stops and the plate just balances it back. This is a CAMERA "
+             "limit, not a plate one: the visible band is only about +-51 mm at "
+             "the juggling base, so a ball past 30 mm is running out of frame "
+             "even though the plate has plenty of room left.\n\n"
+             "Stopping the throw is the strongest correction available - tilt "
+             "cannot steer a ball in the air, so suspending hands the loop the "
+             "whole cycle instead of the 87% it gets while juggling. There is "
+             "deliberate hysteresis: it suspends past this distance but only "
+             "resumes once the ball is back inside 'Centred within', so it "
+             "cannot chatter between the two."),
     Spec("mod_jug_centre_px", "Centred within (px)", "Modes", "float",
          40.0, 5.0, 400.0, 5.0,
          tip="How close to the target the ball must be before juggling starts. "

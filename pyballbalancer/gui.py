@@ -27,9 +27,9 @@ from camera import CameraWorker
 from control import ControlLoop
 from datalog import DataLogger
 from machine_panel import MachinePanel
-from modes import (BALANCE_JUGGLE, BALANCE_REST, BALANCING, JUGGLING,
+from modes import (BALANCE_JUGGLE, BALANCE_REST, BALANCING, JUGGLING, ROUTINE,
                    ModeRunner)
-from params import GROUPS, ParameterStore
+from params import GROUPS, SPEC_BY_KEY, ParameterStore
 from serial_io import SerialWorker, available_ports
 from widgets import ParamGroup, VideoView
 
@@ -202,8 +202,11 @@ class MainWindow(QMainWindow):
         pick = QHBoxLayout()
         pick.addWidget(QLabel("Mode"))
         self.cmb_mode = QComboBox()
-        self.cmb_mode.addItems([BALANCING, BALANCE_REST, BALANCE_JUGGLE,
-                                JUGGLING])
+        # Filled from the parameter's own choices, not a list repeated here.
+        # This used to name the four modes explicitly, so adding a fifth to
+        # params.py left it silently missing from the only control that can
+        # select it - the mode existed, was tested, and was unreachable.
+        self.cmb_mode.addItems(list(SPEC_BY_KEY["mod_mode"].choices))
         self.cmb_mode.setCurrentText(self.params.get("mod_mode"))
         self.cmb_mode.currentTextChanged.connect(
             lambda t: self.params.set("mod_mode", t))
@@ -677,6 +680,30 @@ class MainWindow(QMainWindow):
                        self.params.get("mod_rise_time"),
                        self.params.get("mod_settle_time"),
                        self.params.get("mod_balance_move_time")))
+        if self.params.get("mod_mode") == ROUTINE:
+            walk = self.params.get("mod_rou_walk_mm")
+            circle = self.params.get("mod_rou_circle_mm")
+            leg = int(self.params.get("mod_rou_leg_cycles"))
+            pts = int(self.params.get("mod_rou_circle_points"))
+            per = int(self.params.get("mod_rou_circle_cycles"))
+            cycles = (int(self.params.get("mod_rou_warmup_cycles"))
+                      + 8 * leg + pts * per
+                      + int(self.params.get("mod_rou_settle_cycles")))
+            cycle_s = self.modes.cycle_time()
+            base = origin + self.params.get("mod_jug_low")
+            window = optics.tight_window_mm(base)
+            warn = ""
+            if max(walk, circle) > 0.8 * window:
+                warn = (" Careful: %.0f mm is most of the %.0f mm the camera can "
+                        "see, so the ball may leave the frame at the far end."
+                        % (max(walk, circle), window))
+            return ("The same juggle as Juggling, but the TARGET moves: warm up "
+                    "on centre, walk out and back to %.0f mm on each axis in "
+                    "turn, trace a %.0f mm circle in %d steps, then settle and "
+                    "land. %d cycles in all, about %.0f s. The camera sees "
+                    "+-%.0f mm here.%s"
+                    % (walk, circle, pts, cycles, cycles * cycle_s, window, warn))
+
         low = self.params.get("mod_jug_low")
         high = self.params.get("mod_jug_high")
         base, top = origin + low, origin + high
