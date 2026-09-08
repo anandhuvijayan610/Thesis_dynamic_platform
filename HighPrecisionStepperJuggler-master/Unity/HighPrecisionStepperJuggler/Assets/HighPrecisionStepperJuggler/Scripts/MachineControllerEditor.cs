@@ -80,8 +80,14 @@ namespace HighPrecisionStepperJuggler
                 "Trim X first: tilting one pair changes how level the other looks. Re-level after " +
                 "changing the working origin - the trim is a property of the height, not of the " +
                 "machine.\n\n" +
-                "Nothing persists between runs. Copy the values you settle on into " +
-                "Constants.LevelTrimXDegrees / LevelTrimYDegrees.",
+                "TO KEEP A VALUE: type it into the Level Trim X/Y Degrees fields at the top " +
+                "of this inspector and save the scene (Ctrl+S). Those are [SerializeField]s, so " +
+                "once the scene has stored them THEY are what runs - Awake() copies them over " +
+                "Constants.LevelTrimXDegrees, and editing Constants.cs will not change anything " +
+                "for a scene that already has them. The constants are only the fallback for a " +
+                "scene that has never serialized the field.\n\n" +
+                "The nudge buttons change the live value and the fields, but a value only " +
+                "survives play mode if the scene is saved.",
                 MessageType.None);
 
             EditorGUILayout.Space();

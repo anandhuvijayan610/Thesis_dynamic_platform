@@ -66,6 +66,9 @@ class ModeRunner:
         self._phase = ""
         self._step = 0
         self._cycles = 0
+        self._centred = False
+        self._centre_streak = 0
+        self._state = None
         self._saved_gains = None
         self._last_gain_write = 0.0
         self._hop_step = 0
@@ -105,6 +108,8 @@ class ModeRunner:
         self._hop_step = 0
         self._hops = 0
         self._last_hop = now
+        self._centred = False
+        self._centre_streak = 0
         self._phase = "starting"
         self._last_gain_write = 0.0
         # Remember the gains before touching them, so stopping always puts the
@@ -146,13 +151,15 @@ class ModeRunner:
             self._p.set(live, start + f * (self._p.get(target) - start))
 
     # -- the one call that matters ---------------------------------------
-    def command(self, now: Optional[float] = None) -> Optional[Command]:
+    def command(self, now: Optional[float] = None,
+                state=None) -> Optional[Command]:
         """The pose to send now, or None when nothing is due yet.
 
         Returning None is not idleness — it is the mode declining to interrupt
         a move that is still running.
         """
         now = time.monotonic() if now is None else now
+        self._state = state
         if self._mode == MANUAL or now < self._next_send:
             return None
         origin = self._p.get("mac_origin_offset") / 1000.0
@@ -278,6 +285,42 @@ class ModeRunner:
             self._phase = "rising to %.0f mm" % self._p.get("mod_jug_low")
             self._next_send = self._t0 + rise + settle
             return Command(low, rise, allow_tilt=False, phase=self._phase)
+
+        # Do not start throwing a ball that is not settled in the middle.
+        #
+        # This used to be a fixed wait: rise, pause for mod_settle_time, then
+        # oscillate wherever the ball happened to be. Watching a run back, the
+        # ball began 250 px off centre, and nine cycles later it had walked out
+        # of the camera's window and was gone - the plate was throwing it while
+        # it was already on its way out, and the contact phases never had
+        # enough authority to bring it back. Bouncing a ball that is not
+        # centred does not centre it; it loses it.
+        #
+        # So the settle time is now a MINIMUM rather than the whole test. Until
+        # the ball has actually been near the target and slow for a few
+        # consecutive checks, this keeps balancing at the bottom of the stroke.
+        # A ball that is not visible at all counts as not centred, which is the
+        # safe reading: an unseen ball must never be thrown.
+        if not self._centred:
+            hold = int(self._p.get("mod_jug_centre_hold"))
+            ball = self._state
+            near = False
+            if ball is not None:
+                dx = ball.x - self._p.get("ctl_target_x")
+                dy = ball.y - self._p.get("ctl_target_y")
+                near = (math.hypot(dx, dy) <= self._p.get("mod_jug_centre_px")
+                        and math.hypot(ball.vx, ball.vy)
+                        <= self._p.get("mod_jug_centre_speed"))
+            self._centre_streak = self._centre_streak + 1 if near else 0
+
+            if self._centre_streak < hold:
+                move = self._p.get("mod_balance_move_time")
+                self._phase = ("centring %d/%d" % (self._centre_streak, hold)
+                               if ball is not None else "centring - no ball")
+                self._next_send = now + move
+                return Command(low, move, allow_tilt=True, phase=self._phase)
+
+            self._centred = True
 
         phases: List[Tuple[float, float, str]] = [
             (high, self._p.get("mod_jug_rise_time"), "rise"),

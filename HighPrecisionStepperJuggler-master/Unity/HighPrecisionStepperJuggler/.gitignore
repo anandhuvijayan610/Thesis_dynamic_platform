@@ -1,0 +1,10 @@
+# Unity editor scratch. The repo-root .gitignore anchors its /Temp/ and
+# /Library/ rules to the root, so they never matched this nested project and
+# the noise came in anyway. This file is scoped to the project that generates
+# it.
+#
+# Library/ is deliberately NOT listed: it is already tracked from earlier
+# commits, and adding it here would only hide changes to files git still
+# follows. Untracking it is a separate, history-touching decision.
+Temp/
+EditorInstance.json

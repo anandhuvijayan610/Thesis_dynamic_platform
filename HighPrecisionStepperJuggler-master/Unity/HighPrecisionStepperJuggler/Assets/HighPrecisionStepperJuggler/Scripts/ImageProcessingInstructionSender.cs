@@ -60,10 +60,23 @@ namespace HighPrecisionStepperJuggler
             // and a few mm of lateral throw, nothing like BouncingStrong's 50->80mm slam. Runs
             // SmallJugglingBounceCount times and then lands, rather than running forever, so it
             // reads as a demo rather than a mode.
-            SmallJugglingDemo
+            SmallJugglingDemo,
+
+            // The PyQt host's Juggling mode: a fixed four-phase clock - fast rise, dwell, gentle
+            // fall, dwell - rather than a choreography that advances on what the ball is doing.
+            // Added LAST so the three above keep their serialized ints, and built entirely in
+            // OscillatingJuggling.cs, so selecting anything else gives exactly the behaviour this
+            // project had before it existed.
+            OscillatingJuggling
         }
 
         [SerializeField] private StrategyProgram _strategyProgram = StrategyProgram.BalancingOnly;
+
+        [Header("Oscillating juggling (the PyQt host's cycle)")]
+        // Only read when Strategy Program is OscillatingJuggling. Its defaults are the values the
+        // PyQt host is currently running, so the two hosts juggle the same way out of the box.
+        [SerializeField] private OscillatingJugglingSettings _oscillatingJuggling =
+            new OscillatingJugglingSettings();
 
         [Header("Small juggling demo")]
         // The choreography: rise to _smallJugglingBaseHeightMm above the working origin, settle the
@@ -393,6 +406,13 @@ namespace HighPrecisionStepperJuggler
 
                 case StrategyProgram.FullJugglingDemo:
                     BuildFullJugglingDemo();
+                    break;
+
+                case StrategyProgram.OscillatingJuggling:
+                    OscillatingJuggling.AddTo(_strategies, _oscillatingJuggling,
+                        PIDTiltController.Instance, _balancingTarget, _balancingMoveTime,
+                        onOscillationStart: () => _machineStateView.Set("Oscillating",
+                            MachineStateView.TiltControlType.PIDTiltController));
                     break;
             }
 

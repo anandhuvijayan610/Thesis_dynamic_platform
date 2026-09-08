@@ -24,6 +24,13 @@ def check(label: str, ok: bool, detail: str = "") -> None:
         FAILURES.append(label)
 
 
+class Ball:
+    """Just enough of a BallState for the centring gate to read."""
+
+    def __init__(self, x=0.0, y=0.0, vx=0.0, vy=0.0):
+        self.x, self.y, self.vx, self.vy = x, y, vx, vy
+
+
 def runner(**overrides):
     p = ParameterStore()
     p.set("mac_origin_offset", 10.0)
@@ -107,11 +114,34 @@ def test_juggling() -> None:
     check("gently, and without tilt",
           abs(first.move_time - 0.8) < 1e-12 and not first.allow_tilt)
 
-    # walk one full cycle
+    # A ball that is not settled in the middle must NOT be thrown. Watching a
+    # real run back, juggling began with the ball 250 px off centre and nine
+    # cycles later it had left the camera's window for good, so this is the
+    # precondition that failure asked for.
     t = 1.31
+    for _ in range(60):
+        r.command(t, state=Ball(300.0, 0.0))
+        t += 0.02
+    check("an off-centre ball never starts the oscillation",
+          "centring" in r.phase, r.phase)
+
+    unseen = [r.command(t + i * 0.02) for i in range(40)]
+    check("and neither does a ball that cannot be seen at all",
+          "centring" in r.phase, r.phase)
+    check("it keeps balancing at the bottom while it waits",
+          all(c is None or abs(c.height_m - 0.030) < 1e-12 for c in unseen))
+    t += 40 * 0.02
+
+    # Now settle it, and the cycle may begin.
     seen = []
     while len(seen) < 8:
-        c = r.command(t)
+        c = r.command(t, state=Ball(2.0, 1.0))
+        if c is not None:
+            seen.append(c)
+        t += 0.005
+    seen = [c for c in seen if "centring" not in c.phase]
+    while len(seen) < 8:
+        c = r.command(t, state=Ball(2.0, 1.0))
         if c is not None:
             seen.append(c)
         t += 0.005

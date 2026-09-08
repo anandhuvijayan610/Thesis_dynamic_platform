@@ -406,22 +406,22 @@ namespace HighPrecisionStepperJuggler
                 Height = c.CameraResolutionHeight,    // 480
                 FPS = 120,                            // Measured: this camera really does stream 120fps over MSMF at its native 480x640 (see note in Start())
                 AutoExposure = 0,                     // Manual, so the driver stops re-adjusting frame to frame
-                // DO NOT COPY THE PyQt HOST'S CAMERA SETTINGS HERE. It reached -8 / 120, and that
-                // is correct FOR ITS OWN DETECTOR, which gates on HSV and wants the ball just
-                // below clipping so it keeps its saturation. This host's imgMode 7 traces a
-                // "custom gray" of RED MINUS BLUE and keeps every pixel above Constants.Threshold
-                // (70), so it wants the ball BRIGHT, not merely unclipped. Ported across on
-                // 2026-09-04 and it stopped mode 7 detecting anything at all: the tracer found no
-                // cluster, SelectBall returned its placeholder, and the machine sat armed and idle
-                // with no ball. The two detectors want different images and their camera settings
-                // are not shared.
-                Exposure = -5,                        // As per the known-good OpenCV 4.2 setup
-                Gain = 110,                           // NOT the 4.2 screenshot's 15: that was on MSMF's scale, and these are
-                                                      // now written through DSHOW, whose scale differs. 110 reproduces a
-                                                      // comparable image (measured stream brightness ~114). Mode 7 may want
-                                                      // brighter still - r-b peaked near 217 at this gain and the tracer is
-                                                      // happier when it saturates, so try 160-200 if [Detect] reports that
-                                                      // nothing passes Constants.Threshold.
+                // -8 / 120, the same pair the PyQt host runs, and MEASURED for this pipeline
+                // rather than inherited from it. GrayMode 0 is simply red-minus-blue, so the
+                // question is only whether the ball clears Constants.Threshold: measured on this
+                // camera at these settings, r-b reaches 138 against a threshold of 70, with the
+                // ball's own pixels well clear of the background.
+                //
+                // These were briefly reverted to -5 / 110 on the theory that -8 was too dark for
+                // the tracer. That was an inference from a failed run, not a measurement, and it
+                // was wrong - the cost of the brighter setting is that the ball CLIPS, blooms,
+                // and measures about 20% too large. That matters far more here than in the PyQt
+                // host: there the radius only trims the gains, while here the radius IS the
+                // height (FOVCalculations.RadiusToDistance), so an inflated one is a wrong ball
+                // height feeding every juggling stage, and the size cap in SelectBall correctly
+                // refuses it.
+                Exposure = -8,
+                Gain = 120,
                 Contrast = 25,                        // 4.2 value
                 Saturation = 160,                     // 4.2 value
                 Brightness = 64,                      // driver clamps at 64

@@ -179,7 +179,12 @@ for _i in range(360 // _STEP):
 serrated = np.full((480, 640, 3), 40, np.uint8)
 cv2.fillPoly(serrated, [np.array(_pts, np.int32)], (30, 120, 240))
 
-_cs, _ = cv2.findContours(_build_mask(serrated, params), cv2.RETR_EXTERNAL,
+# Deliberately measured at kernel 3, the setting the real failure happened at.
+# The shipped kernel is now 7, which smooths a serration this fine away - good
+# in practice, but it would leave this test asserting nothing, since the whole
+# point is to prove fill survives a mask that circularity cannot cope with.
+SERR_PARAMS = dict(params, vis_kernel=3)
+_cs, _ = cv2.findContours(_build_mask(serrated, SERR_PARAMS), cv2.RETR_EXTERNAL,
                           cv2.CHAIN_APPROX_NONE)
 _c = max(_cs, key=cv2.contourArea)
 _a, _per = cv2.contourArea(_c), cv2.arcLength(_c, True)
@@ -190,7 +195,7 @@ check("a serrated edge really does wreck circularity", _circ < 0.55,
       "circularity %.2f, and the real ball measured 0.43" % _circ)
 check("while fill barely notices", _fill > 0.80, "fill %.2f" % _fill)
 
-det_serr, _ = settle(serrated, params)
+det_serr, _ = settle(serrated, SERR_PARAMS)
 check("so a ragged-edged ball is still detected", det_serr is not None,
       "circularity %.2f, fill %.2f" % (_circ, _fill) if det_serr is None
       else "r=%.0f (want ~100)" % det_serr.radius)
@@ -321,10 +326,13 @@ vp.process(bar, params)                       # the elongated bar from above
 check("an unround blob says so",
       any("round" in r for r in vp.rejections), "; ".join(vp.rejections[:2]))
 
-# radius 5 survives the morphology open but is under the 120 px area floor
+# Under the 120 px area floor, but big enough to survive the morphology open -
+# which the shipped kernel of 7 would otherwise erase completely, turning this
+# into a test of the kernel rather than of the area gate. Radius 6 gives an
+# area of 113, just under the floor, on a mask the opening leaves intact.
 tiny = np.full((480, 640, 3), 40, np.uint8)
-cv2.circle(tiny, (320, 240), 5, (30, 120, 240), -1)
-vp.process(tiny, params)
+cv2.circle(tiny, (320, 240), 6, (30, 120, 240), -1)
+vp.process(tiny, dict(params, vis_kernel=1))
 check("a blob under the area floor says so",
       any("small" in r for r in vp.rejections), "; ".join(vp.rejections[:2]))
 

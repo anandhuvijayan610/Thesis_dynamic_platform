@@ -348,7 +348,9 @@ class MainWindow(QMainWindow):
         if self._armed and self.serial.is_open:
             # The mode owns the height and the cadence; the loop owns the tilt.
             # A None means a move is still running and must not be interrupted.
-            cmd = self.modes.command()
+            # The mode needs the ball, not just the clock: juggling must not
+            # start throwing until it is settled in the middle.
+            cmd = self.modes.command(state=self._state)
             if cmd is not None:
                 tx, ty = (x, y) if cmd.allow_tilt else (0.0, 0.0)
                 self.serial.send_pose(cmd.height_m, tx, ty, cmd.move_time)

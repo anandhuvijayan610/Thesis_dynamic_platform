@@ -38,8 +38,8 @@ namespace HighPrecisionStepperJuggler
         // Constants.LevelTrim*Degrees in Awake() so it can be set from the inspector; see the
         // long note on those for why this is a property of the HEIGHT and has to be re-measured
         // whenever the origin offset moves.
-        [SerializeField] private float _levelTrimXDegrees = -2.50f;
-        [SerializeField] private float _levelTrimYDegrees = -2.10f;
+        [SerializeField] private float _levelTrimXDegrees = -0.80f;
+        [SerializeField] private float _levelTrimYDegrees = -1.30f;
 
         // How much one press of a nudge button moves the trim.
         [SerializeField] private float _levelTrimStepDegrees = 0.10f;

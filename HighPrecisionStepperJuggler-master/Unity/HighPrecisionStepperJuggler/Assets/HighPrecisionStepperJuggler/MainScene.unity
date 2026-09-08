@@ -1015,6 +1015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serial: {fileID: 165232600}
+  _logSentLines: 0
 --- !u!114 &165232600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1607,13 +1608,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 250312748}
-    characterCount: 0
+    characterCount: 8
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 0
+    spaceCount: 1
+    wordCount: 2
     linkCount: 0
-    lineCount: 0
-    pageCount: 0
+    lineCount: 1
+    pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
@@ -2887,13 +2888,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 420128147}
-    characterCount: 0
+    characterCount: 9
     spriteCount: 0
     spaceCount: 0
-    wordCount: 0
+    wordCount: 1
     linkCount: 0
-    lineCount: 0
-    pageCount: 0
+    lineCount: 1
+    pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
@@ -3614,13 +3615,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 515650614}
-    characterCount: 0
+    characterCount: 15
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 0
+    spaceCount: 2
+    wordCount: 2
     linkCount: 0
-    lineCount: 0
-    pageCount: 0
+    lineCount: 1
+    pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
@@ -3971,13 +3972,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 581462653}
-    characterCount: 0
+    characterCount: 16
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 0
+    spaceCount: 2
+    wordCount: 3
     linkCount: 0
-    lineCount: 0
-    pageCount: 0
+    lineCount: 1
+    pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
@@ -5433,6 +5434,7 @@ MonoBehaviour:
     Brightness: 0
     Gamma: 0
     ISO: 0
+  _logDetectionRejections: 1
 --- !u!4 &807047507
 Transform:
   m_ObjectHideFlags: 0
@@ -8110,6 +8112,9 @@ MonoBehaviour:
   _modelMachine: {fileID: 333164413}
   _originHeightOffsetMm: 20
   _originMoveTime: 0.5
+  _levelTrimXDegrees: -0.8
+  _levelTrimYDegrees: -1.3
+  _levelTrimStepDegrees: 0.1
   _startupDelay: 0.5
   _backlashTestTiltDegrees: 1
   _backlashTestHeight: 0.05
@@ -8154,7 +8159,17 @@ MonoBehaviour:
   _targetCrossVisualizer: {fileID: 1117639990}
   _currentPositionCrossVisualizer: {fileID: 42406167}
   _machineStateView: {fileID: 346410669}
-  _strategyProgram: 2
+  _strategyProgram: 3
+  _oscillatingJuggling:
+    LowMm: 35
+    HighMm: 51
+    RiseTime: 0.05
+    TopDwellTime: 0.07
+    FallTime: 0.16
+    BottomDwellTime: 0.14
+    Cycles: 10000
+    SettleCycles: 15
+    SendWholeCycleAtOnce: 1
   _smallJugglingBaseHeightMm: 40
   _smallJugglingOscillationMm: 25
   _smallJugglingRiseTime: 0.1
@@ -9809,13 +9824,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1662470609}
-    characterCount: 0
+    characterCount: 23
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 0
+    spaceCount: 2
+    wordCount: 3
     linkCount: 0
-    lineCount: 0
-    pageCount: 0
+    lineCount: 1
+    pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0

@@ -145,15 +145,15 @@ namespace HighPrecisionStepperJuggler
         // other pair looks, so the second axis has to be set after the first, not alongside it.
         //
         // THESE ARE NOT CONSTANTS OF THE MACHINE. On this rig they have read -0.20/+1.50,
-        // -1.30/+0.35, -1.40/-0.70 and now -2.50/-2.10, and Y has changed sign. The last jump came
-        // purely from raising OriginHeightOffset by 10mm, which is the clearest evidence that the
-        // trim is a property of the HEIGHT - the linkage carries a residual slope that varies
-        // along its travel. Re-level after changing the origin offset, after the arms are
+        // -1.30/+0.35, -1.40/-0.70, -2.50/-2.10 and now -0.80/-1.30, and Y has changed sign along
+        // the way. One of those jumps came purely from raising OriginHeightOffset by 10mm, which
+        // is the clearest evidence that the trim is a property of the HEIGHT - the linkage carries
+        // a residual slope that varies along its travel. Re-level after changing the origin offset, after the arms are
         // disturbed, and after anything that may have cost a step. The symptom of a stale trim is
         // a ball that will not settle in the middle at ANY gain: 0.6 deg of residual tilt
         // accelerates it at about 70 mm/s^2, which no amount of tuning removes.
-        public static float LevelTrimXDegrees = -2.50f;
-        public static float LevelTrimYDegrees = -2.10f;
+        public static float LevelTrimXDegrees = -0.80f;
+        public static float LevelTrimYDegrees = -1.30f;
 
         // How fast the commanded tilt is allowed to change, deg/s. The clamp above bounds how FAR
         // the plate may tilt; this bounds how fast it may get there, which is the part the ball

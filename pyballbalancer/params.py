@@ -96,13 +96,29 @@ SPECS: List[Spec] = [
              "matters. It can be this strict only because the ball is not "
              "overexposed; a blown-out highlight has no saturation at all."),
     Spec("vis_s_hi", "Sat high", "Vision", "int", 255, 0, 255, 1),
-    Spec("vis_v_lo", "Val low", "Vision", "int", 50, 0, 255, 1,
-         tip="Deliberately loose. The ball is dim at this exposure and its "
-             "shaded edge dimmer still; saturation is doing the separating, so "
-             "value only has to reject sensor noise in the black background."),
+    Spec("vis_v_lo", "Val low", "Vision", "int", 15, 0, 255, 1,
+         tip="Deliberately loose, and 15 rather than the 50 it used to be. "
+             "Saturation is what separates ball from background here, so value "
+             "only has to reject sensor noise in the black background - and at "
+             "50 it was doing far more than that.\n\n"
+             "Measured when the ball came out as a crescent: 95% of its pixels "
+             "passed the saturation floor but only 54% passed V>=50, because "
+             "the ball's own value runs median 53, p25 17, p5 2. Nearly half of "
+             "it was being cut off, giving fill 0.76 and circularity 0.31 - "
+             "rejected as not round, when nothing was wrong with the ball. At "
+             "15 the whole ball comes back: fill 0.984, circularity 0.883.\n\n"
+             "Do not go much lower. At 8 the background starts clearing the "
+             "floor too and the mask breaks into 2-3 blobs; 15 holds at one."),
     Spec("vis_v_hi", "Val high", "Vision", "int", 255, 0, 255, 1),
     Spec("vis_diff_thresh", "r−b threshold", "Vision", "int", 70, 0, 255, 1),
-    Spec("vis_kernel", "Morphology kernel", "Vision", "int", 3, 0, 15, 1),
+    Spec("vis_kernel", "Morphology kernel", "Vision", "int", 7, 0, 15, 1,
+         tip="Radius of the ellipse used to open then close the mask. Raised "
+             "from 3 to 7 alongside the value floor: a lower floor lets in more "
+             "speckle, and the larger kernel is what keeps the ball a single "
+             "blob rather than several. Measured at the shipped floor of 15, "
+             "averaged over 15 frames: kernel 3 gives 4.1 blobs, 5 gives 1.8, "
+             "7 gives 1.1 - and circularity improves with it too, 0.871 to "
+             "0.883, because the boundary comes out smoother."),
     Spec("vis_min_area", "Min blob area", "Vision", "int", 120, 1, 200000, 10),
     Spec("vis_max_area", "Max blob area", "Vision", "int", 120000, 1, 500000, 100),
     Spec("vis_min_fill", "Min fill", "Vision", "float", 0.80, 0.0, 1.0, 0.01,
@@ -376,7 +392,7 @@ SPECS: List[Spec] = [
              "can hold it in two dimensions. Check it by eye: press X+ on this "
              "tab and watch which corners rise - they must be diagonal to each "
              "other, not side by side."),
-    Spec("mac_trim_x", "Level trim X (deg)", "Machine", "float", -2.50, -8.0, 8.0, 0.05,
+    Spec("mac_trim_x", "Level trim X (deg)", "Machine", "float", -0.40, -8.0, 8.0, 0.05,
          tip="Standing tilt of the plate when all four arms are at their "
              "origin, cancelled out. Added to every commanded tilt, so a "
              "'level' command becomes whatever actually makes the plate level "
@@ -392,7 +408,7 @@ SPECS: List[Spec] = [
              "that will not settle in the middle no matter how the gains are "
              "tuned; 0.6 deg of residual tilt accelerates the ball at about "
              "70 mm/s^2, which no gain change removes."),
-    Spec("mac_trim_y", "Level trim Y (deg)", "Machine", "float", -2.10, -8.0, 8.0, 0.05,
+    Spec("mac_trim_y", "Level trim Y (deg)", "Machine", "float", -0.40, -8.0, 8.0, 0.05,
          tip="The same for the other axis; it has been +1.50, +0.35, -0.70 and "
              "now -2.10 on this rig, so do not treat any of those as a target to "
              "return to - measure it. Trim X first: a tilt on one pair changes "
@@ -509,6 +525,23 @@ SPECS: List[Spec] = [
              "is 0.53 s, and that alone left a 57 mm swing. Read every window "
              "in this application as samples divided by 30."),
 
+    Spec("mod_jug_centre_px", "Centred within (px)", "Modes", "float",
+         40.0, 5.0, 400.0, 5.0,
+         tip="How close to the target the ball must be before juggling starts. "
+             "Bouncing a ball that is not centred does not centre it - it loses "
+             "it. Watching a run back: the ball began 250 px off centre, the "
+             "plate threw it anyway, and nine cycles later it had walked out of "
+             "the camera window. 40 px is about 7 mm at the juggling base."),
+    Spec("mod_jug_centre_speed", "Centred below (px/s)", "Modes", "float",
+         120.0, 10.0, 1000.0, 10.0,
+         tip="And how slow. Position alone is not enough - a ball crossing the "
+             "middle at speed is momentarily 'centred' and is the worst moment "
+             "to throw it."),
+    Spec("mod_jug_centre_hold", "Centred for (commands)", "Modes", "int",
+         8, 1, 100, 1,
+         tip="Consecutive checks that must pass before the oscillation begins, "
+             "so a single lucky frame cannot start it. At the balancing move "
+             "time this is roughly half a second of genuinely settled ball."),
     Spec("mod_jug_low", "Juggle low (mm)", "Modes", "float", 35.0, 0.0, 70.0, 1.0,
          tip="Bottom of the stroke, and the tightest the camera's view of the "
              "plate ever gets during a cycle. The camera is close underneath, "
