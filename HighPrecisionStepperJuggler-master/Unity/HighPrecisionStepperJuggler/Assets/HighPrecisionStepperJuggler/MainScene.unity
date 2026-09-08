@@ -8170,6 +8170,12 @@ MonoBehaviour:
     Cycles: 10000
     SettleCycles: 15
     SendWholeCycleAtOnce: 0
+    AimTheThrow: 1
+    SuspendBeyondMm: 30
+    ResumeWithinMm: 8
+    ResumeSpeedMmPerSec: 25
+    ResumeHoldCommands: 8
+    RecoverAtTopOfStroke: 0
   _smallJugglingBaseHeightMm: 40
   _smallJugglingOscillationMm: 25
   _smallJugglingRiseTime: 0.1
