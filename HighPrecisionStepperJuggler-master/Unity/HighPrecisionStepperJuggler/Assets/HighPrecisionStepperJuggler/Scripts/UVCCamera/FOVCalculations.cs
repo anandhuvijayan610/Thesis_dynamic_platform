@@ -85,8 +85,29 @@ namespace HighPrecisionStepperJuggler
 
         // Tolerance on the cap below. Covers detector noise (measured +-0.23px on a stable ball),
         // the plate under- or overshooting its commanded height, and the fact that the ball sits on
-        // TOP of the plate rather than at the plate plane. 10% at the 20mm working height is ~16px.
-        private const float BallRadiusToleranceFactor = 1.10f;
+        // TOP of the plate rather than at the plate plane.
+        //
+        // 1.25, not the 1.10 it was. Those three allowances are all about the ball's true position;
+        // none of them covers the fact that the BORDER TRACER AND THE MODEL MEASURE DIFFERENTLY.
+        // DistanceToRadius inverts a lens formula fitted to one particular way of measuring a
+        // radius; imgMode 7 measures its own way, by tracing the boundary of everything above
+        // Constants.Threshold, and on this rig it reads consistently larger. Measured at the 20mm
+        // working origin: a clean, complete ball (roundness 0.90, which is a perfect digital
+        // circle) traced at r=157..159px against a predicted 136 - about 17% over, frame after
+        // frame, with the old cap at 149 rejecting every one of them. The machine sat idle while
+        // the detector was working perfectly.
+        //
+        // That is a calibration difference between two measurement methods, not an implausible
+        // ball, and this cap exists to reject the latter. It still does: the ceiling shows up at
+        // r=377, nearly three times the prediction, and is thrown out with room to spare.
+        //
+        // Worth knowing what this does NOT fix. If the plate is genuinely not reaching its
+        // commanded height - the firmware's zero is its power-on position and drifts with lost
+        // steps - the radius is honestly reporting that, and widening the cap only hides it. The
+        // tell is the reported ball HEIGHT being wrong rather than the detection failing, since
+        // every juggling stage keys off that height. Power-cycle with the plate at rest and
+        // re-check before assuming this is the whole answer.
+        private const float BallRadiusToleranceFactor = 1.25f;
 
         /// <summary>
         /// Largest radius in pixels the ball could plausibly have right now, given where the plate

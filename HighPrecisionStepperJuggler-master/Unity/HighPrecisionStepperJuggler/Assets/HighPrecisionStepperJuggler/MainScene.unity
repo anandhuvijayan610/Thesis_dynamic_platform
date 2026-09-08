@@ -8169,7 +8169,7 @@ MonoBehaviour:
     BottomDwellTime: 0.14
     Cycles: 10000
     SettleCycles: 15
-    SendWholeCycleAtOnce: 1
+    SendWholeCycleAtOnce: 0
   _smallJugglingBaseHeightMm: 40
   _smallJugglingOscillationMm: 25
   _smallJugglingRiseTime: 0.1

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using c = HighPrecisionStepperJuggler.Constants;
@@ -15,7 +15,16 @@ namespace HighPrecisionStepperJuggler
     [Serializable]
     public class OscillatingJugglingSettings
     {
-        [Tooltip("Bottom of the stroke, mm above the working origin. The ball is caught here.")]
+        [Tooltip("Bottom of the stroke, mm above the working origin, and the tightest the " +
+                 "camera's view ever gets during a cycle.\n\n" +
+                 "Raising this buys field of view - the camera looks up from below, so a higher " +
+                 "plate is further away and sees more of it: +-51.3mm at a 55mm plate against " +
+                 "+-57.6mm at 70mm, and the throw is unchanged because it depends on the stroke " +
+                 "length rather than the height. That was tried at 50 and reverted, because the " +
+                 "trim on this rig is a property of the HEIGHT: moving the base 15mm put the " +
+                 "plate somewhere it had never been levelled for, and the ball rolled out of " +
+                 "frame before the loop could see it. Re-level at the new base FIRST if you " +
+                 "raise this.")]
         public float LowMm = 35f;
 
         [Tooltip("Top of the stroke, mm above the working origin. Stroke length is the knob for " +
@@ -49,16 +58,21 @@ namespace HighPrecisionStepperJuggler
                  "settled first, bouncing will not settle it.")]
         public int SettleCycles = 15;
 
-        [Tooltip("ON: the whole four-phase cycle goes out as ONE batch, so the firmware runs the " +
-                 "phases back to back. MachineController adds 50ms after each batch it accepts, " +
-                 "and batching pays that once per cycle instead of four times: 0.47s per cycle " +
-                 "rather than 0.62s, against the PyQt host's 0.50s. The cost is that tilt is " +
-                 "chosen once per cycle instead of at every phase boundary.\n\n" +
-                 "OFF: one phase per instruction, so tilt is recomputed four times a cycle as it " +
-                 "is on the PyQt host - but the cycle stretches to 0.62s and the plate then " +
-                 "waits at the top nearly twice as long as the ball is actually airborne, which " +
-                 "is what makes the rhythm feel wrong.")]
-        public bool SendWholeCycleAtOnce = true;
+        [Tooltip("OFF (the default): one phase per instruction, so the tilt is recomputed four " +
+                 "times a cycle as it is on the PyQt host. The cycle stretches to 0.62s because " +
+                 "MachineController charges 50ms after every batch it accepts, and pays it four " +
+                 "times instead of once.\n\n" +
+                 "ON batches all four phases into one command, which pays that 50ms once and " +
+                 "gives a 0.47s cycle - but then ONE tilt is held for the entire cycle, and that " +
+                 "is dangerous here. The ball is in contact with the plate for about 0.32s of it, " +
+                 "and 3 degrees over 0.32s accelerates it to 116 mm/s and moves it 18mm - in a " +
+                 "single cycle, with no chance to correct until the next one. Measured on a real " +
+                 "run: the ball crossed the camera's whole window in about a second and was " +
+                 "thrown clear. A loop correcting once every 0.47s cannot arrest something it " +
+                 "accelerates that hard.\n\n" +
+                 "Turn it on only for a gentle stroke, or with the tilt clamp well below 3 " +
+                 "degrees. The rhythm it buys is not worth losing the ball.")]
+        public bool SendWholeCycleAtOnce = false;
     }
 
     /// <summary>
