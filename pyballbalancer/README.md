@@ -17,7 +17,11 @@ python main.py
 | `camera.py` | `CameraWorker` — capture thread, applies UVC controls, runs detection |
 | `vision.py` | two interchangeable detectors, both returning centre-frame coordinates |
 | `control.py` | velocity estimation, PID, mirror-law tilt, the fixed-rate `ControlLoop` |
-| `serial_io.py` | `SerialWorker` — owns the port, coalesces writes, parses telemetry |
+| `serial_io.py` | `SerialWorker` — owns the port, coalesces writes, applies the level trim, parses telemetry |
+| `machine.py` | kinematics: plate pose → four arm angles → the firmware's wire format |
+| `machine_panel.py` | the Machine tab: manual moves, levelling at the working height, bring-up tests |
+| `modes.py` | the session modes and juggling supervision; owns height, move time and cadence |
+| `optics.py` | camera window and throw physics, validated against the rig |
 | `datalog.py` | buffered CSV recorder |
 | `widgets.py` | parameter editors and the video view |
 | `gui.py` | `MainWindow` — assembles panels, owns the workers, routes signals |
@@ -84,12 +88,21 @@ These are on this machine, found by adjustment until the ball sits still in the
 middle of the plate and does not roll:
 
 ```
-arm pairing   0+2 / 1+3          motors confirmed opposite by eye
-level trim    X -1.30, Y +0.35   degrees
-axis mapping  swap/invertX/invertY all off
-gains         kp 0.05  ki 0.10  kd 0.07,  integral clamp 20
-limits        max tilt 3 deg, max tilt rate 25 deg/s
+arm pairing     0+2 / 1+3                 motors confirmed opposite by eye
+working origin  20 mm above the mechanical dead position
+level trim      X -0.40, Y -0.40 degrees, levelled at 35 mm (mac_trim_height)
+axis mapping    swap/invertX/invertY all off
+gains           kp 0.02  ki 0.10  kd 0.04 per axis,  integral clamp 20,
+                scaled with ball radius (reference radius 111 px)
+limits          max tilt 3 deg, max tilt rate 25 deg/s, command rate 100 Hz
+camera          exposure -8, gain 120
+detection       H 0..20, S>=150, V>=15, kernel 7, min fill 0.80, min circularity 0.30
 ```
+
+The trim and gains have been re-found more than once as the rig changed: an
+earlier set (trim X -1.30 / Y +0.35, kp 0.05 / kd 0.07) predates levelling at
+the working height and is superseded. The values above are the shipped defaults
+in `params.py`.
 
 Two things about the trim are easy to get wrong. It is **per pairing** --
 changing which motor each tilt drives invalidates it -- and it is **per
@@ -137,10 +150,14 @@ that constant from every target, so a trim added there too would cancel itself
 out and the plate would never move. The Unity host documents the same trap for
 its own origin offset.
 
-The nudge buttons and a spirit level are how to get *close*, but they set the
-plate level at the origin, and the shipped defaults are not those values -- see
-**Settled calibration** above. What the controller needs is a plate level at
-the height it runs at, and the two differ here by about 1.5 degrees.
+**Level where the loop works, not at the origin.** The linkage carries a
+residual slope that changes along its travel, so the trim is a property of the
+*height* as much as of the machine -- here the two differ by about 1.5 degrees
+between the origin and the working height. The nudge buttons therefore send the
+plate to `mac_trim_height` (35 mm above the working origin by default) and
+adjust it there, rather than at the origin. A spirit level gets you close; the
+definition that matters is that the ball stays put at that height. See
+**Settled calibration** above for the shipped values.
 
 Measured on the rig, the origin pose at several trims:
 
@@ -180,6 +197,11 @@ completely:
 | radius reported | 90 px, true 139 | 97 px, true 100 |
 | frame-to-frame jitter | - | 1.1 px |
 | live detection rate | 94% | 40 of 40 |
+
+*(The shipped camera setting is now exposure -8 with gain 120, and the value
+floor has since been lowered to `V>=15` with a 7 px kernel and a fill gate -- a
+floor of 50 was cutting away the ball's shaded half. The measurement above is
+kept because it is the evidence for the principle.)*
 
 The gate that suits that image is `H 0..20, S>=150, V>=50`. **Saturation is what
 separates ball from background**, and it can be that strict only because the
@@ -264,14 +286,34 @@ the tool says so rather than reporting a guess.
 
 ## Modes
 
-Four, picked on the Session tab; the numbers live on the Modes tab.
+Five, picked on the Session tab; the numbers live on the Modes tab.
 
 | mode | what it does |
 |---|---|
 | **Balancing** | holds the ball at the balancing height, indefinitely |
 | **Balance then rest** | holds it lively for a while, then softens the gains so it slows and stops in the middle |
-| **Balance and juggle** | holds it centred, and throws a small hop every few seconds |
-| **Juggling** | bounces continuously, four phases per cycle |
+| **Balance and juggle** | holds it centred, and throws a hop every few seconds |
+| **Juggling** | bounces continuously, four phases per cycle (35 → 51 mm by default) |
+| **Juggle routine** | a structured sequence modelled on the Unity host's Full Juggling Demo: warm-up bounces, then walking the target out and back and tracing a small circle, with settling cycles between legs |
+
+### Juggling is supervised
+
+The camera's window is narrow, so a drifting ball is lost long before the plate
+runs out of travel. Both juggling modes therefore treat "centred" as something
+to keep earning:
+
+- **Throwing only starts** once the ball is within `mod_jug_centre_px` (40 px)
+  and slower than `mod_jug_centre_speed` (120 px/s) for `mod_jug_centre_hold`
+  (8) consecutive commands.
+- **Throwing stops** and the plate falls back to balancing whenever the ball
+  drifts beyond `mod_jug_keep_mm` (30 mm) or is unseen for
+  `mod_jug_lost_seconds` (0.4 s). The routine also resets its target to the
+  centre.
+- **While re-centring, the rest gains are swapped in**, which bring the ball in
+  faster than the lively juggling gains.
+- **If the plate was at the top of a stroke, it comes down over the fall time.**
+  Dropping 16 mm in a short balancing move is about 2 g, which pulls the plate
+  out from under the ball and throws it again.
 
 ### Sizing a hop
 
@@ -281,8 +323,9 @@ this machine.** Measured: 30 mm in 0.10 s (1.51 g) separates it, while 20 mm in
 little time to reach the speed being asked for, so they under-deliver. If the
 ball is not leaving the plate, go **bigger and slower**, not faster.
 
-The shipped hop is the proven point: 30 mm in 0.10 s, leaving at 0.47 m/s for an
-11 mm hop with about 0.10 s of air. The plate then holds still at the top for
+30 mm in 0.10 s is the smallest proven hop, leaving at 0.47 m/s for an 11 mm hop
+with about 0.10 s of air; the shipped *Balance and juggle* default is now a
+larger 50 mm in 0.11 s (`mod_hop_mm`, `mod_hop_rise`). The plate then holds still at the top for
 that airborne time, so the ball lands on a stationary surface rather than a
 moving one, and returns down twice as slowly -- the fall throws nothing, so
 speed there is only shaking the frame.
@@ -295,7 +338,7 @@ hop throws away exactly the correction that would put it there.
 
 The Session tab picks a mode and starts it; the Modes tab holds the numbers.
 
-**Balancing** rises once to `mod_balance_height` (40 mm above the working
+**Balancing** rises once to `mod_balance_height` (30 mm above the working
 origin by default) over `mod_rise_time`, waits `mod_settle_time`, then holds
 that height and issues a tilt every `mod_balance_move_time`. No tilt is applied
 during the climb: the ball has nothing useful to say while the platform is
@@ -352,8 +395,9 @@ The *Machine* tab exists because a control loop cannot be debugged before the
 three things under it are known to work, in this order:
 
 1. **Go to ORIGIN** — level, at the working origin. The plate at rest has no
-   downward travel, so the origin is parked ~10 mm above it to give the loop
-   room to move either way.
+   downward travel -- and the structure interferes near the bottom -- so the
+   working origin is parked 20 mm above it (`mac_origin_offset`) to give the
+   loop room to move either way.
 2. **Height, no tilt** — a pure vertical move proves all four arms are driven,
    wired the same way round, and agree with each other. If the plate skews, the
    fault is mechanical or in `MOTOR_ORDER`, not in the control maths.
@@ -393,8 +437,9 @@ transport delay, and such a plant needs the derivative term to be stable at
 all; proportional-only control oscillates with growing amplitude no matter how
 small the gain. `simtest.py` demonstrates both cases.
 
-Measured behaviour of the shipped gains (`Kp` 0.05, `Kd` 0.07) against the
-simulated plant:
+Measured behaviour of an earlier gain pair (`Kp` 0.05, `Kd` 0.07) against the
+simulated plant -- the shipped defaults are now softer (0.02 / 0.04), but the
+delay trend is the lesson and still holds:
 
 | loop delay | result |
 |---|---|
