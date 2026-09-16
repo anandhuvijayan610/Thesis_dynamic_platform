@@ -412,7 +412,8 @@ namespace HighPrecisionStepperJuggler
                     OscillatingJuggling.AddTo(_strategies, _oscillatingJuggling,
                         PIDTiltController.Instance, _balancingTarget, _balancingMoveTime,
                         onOscillationStart: () => _machineStateView.Set("Oscillating",
-                            MachineStateView.TiltControlType.PIDTiltController));
+                            MachineStateView.TiltControlType.PIDTiltController),
+                        aimController: AnalyticalTiltController.Instance);
                     break;
             }
 
