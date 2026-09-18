@@ -7,7 +7,7 @@
 | Microcontroller | Teensy 4.0 |
 | Stepper drivers | 4 × StepperOnline **DM542T** |
 | Motors | 4 × NEMA17 **17HS19-1684S-PG5** — 1.8°/step, **5.18:1** planetary gearbox, 1.68 A/phase |
-| Power | 36 V / 8 A supply; buck converter for the 5 V rail |
+| Power | 36 V / 8 A supply (the schematic labels the rail 35 V); **XL4016** buck converter for the 5 V rail |
 | Linkage | 4 arms, `L1 = 89 mm`, `L2 = 80 mm`, plate joints 299 mm apart, `Q = 70.023 mm` |
 | Camera | UVC USB camera, 60.41° horizontal FOV, mounted **below** a transparent plate |
 | Ball | 40 mm diameter (radius 20 mm) |
@@ -16,6 +16,19 @@ Datasheets for all of these are in [`datasheets/`](../datasheets/); CAD is in [`
 and [`stl files/`](../stl%20files/).
 
 ### Wiring (Teensy → DM542T)
+
+The finalised, working connection diagram:
+
+[![Finalised wiring schematic: Teensy 4.0 through a TXS0108E level shifter to four DM542T drivers and four NEMA17 motors, with an XL4016 buck converter making the 5 V rail](media/wiring-schematic.png)](media/wiring-schematic.pdf)
+
+*Click for the vector PDF ([media/wiring-schematic.pdf](media/wiring-schematic.pdf)). Drawn in
+EasyEDA; the source is also kept in
+[`my_documents/connection diagrams/`](../my_documents/connection%20diagrams/).*
+
+Reading it: the main rail feeds all four `DM542T` `+V` inputs and an **XL4016** buck converter that
+makes **5 V**; the **TXS0108E** shifts the Teensy's eight STEP/DIR lines up to that 5 V rail
+(`VCCA` 3.3 V, `VCCB` 5 V, `OE` held high through a 10 kΩ pull-up, 0.1 µF on each supply). Motor
+coils follow the legend — **A+ yellow, A− green, B+ red, B− blue**.
 
 Pin numbers are fixed in the firmware's `Constants.h`:
 
@@ -26,14 +39,15 @@ Pin numbers are fixed in the firmware's `Constants.h`:
 | 3 | 4 | 3 |
 | 4 | 8 | 7 |
 
-Common-cathode wiring: `PUL-` and `DIR-` to Teensy GND, the `+` inputs driven from the Teensy pins,
-`ENA` left unconnected (enabled). Diagrams are in
-[`my_documents/connection diagrams/`](../my_documents/connection%20diagrams/).
+Common-cathode wiring: `PUL-` and `DIR-` to GND, the `+` inputs driven from the Teensy through the
+level shifter, `ENA` left unconnected (enabled).
 
-> **Signal levels.** The Teensy is a 3.3 V part and the DM542T inputs are optocouplers specified
-> for 5 V. The TXS0108E level shifter could not source enough current for them and was bypassed, so
-> the signals are driven directly at 3.3 V. That works, but under-drives the opto inputs. The
-> robust fix is a 5 V buffer such as a 74HCT541, or one NPN transistor per line.
+> **Signal levels.** The Teensy is a 3.3 V part and the DM542T inputs are optocouplers specified for
+> 5 V, which is why the TXS0108E sits between them in the schematic above. Note that the TXS0108E is
+> an auto-direction transceiver with weak drive: earlier bring-up on this rig found it could not
+> source what the opto inputs wanted, and the lines were temporarily driven straight from the
+> Teensy at 3.3 V instead. If the drivers ever behave as though they are missing pulses at speed, a
+> stronger 5 V buffer — a 74HCT541, or one NPN transistor per line — is the robust fix.
 
 ### DM542T DIP switches
 
