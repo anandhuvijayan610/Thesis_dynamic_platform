@@ -9,19 +9,23 @@ open-source [HighPrecisionStepperJuggler](https://github.com/T-Kuhn/HighPrecisio
 
 ## Demo
 
-| | |
-|---|---|
-| **[▶ Juggling](docs/media/juggling.mp4)** (14 s) | The machine itself: the plate throws the ball and catches it, cycle after cycle. |
-| **[▶ Holding a target](docs/media/balancing.mp4)** (91 s) | The control app. The ball is tracked in red; the **green cross is the commanded position**, and the loop keeps the ball on it. Click anywhere in the video to move the target. |
-| **[▶ Juggling from the camera view](docs/media/tuning.mp4)** (25 s) | The same juggle seen from the camera under the plate, with the live plots running — ball position, commanded vs acknowledged tilt, and loop rate. |
+![The machine juggling: the plate throws the ball and catches it, cycle after cycle](docs/media/juggling.gif)
 
-Click a clip to play it on GitHub. These are compressed copies of the originals in
-`my_documents/images/present/` (91 MB → 4 MB), kept small so cloning stays quick.
+**Juggling.** The plate throws the ball and catches it, over and over.
 
-<!-- To play a clip inline in this page instead of on its own page: open this repository on
-     github.com, start a new issue, drag the .mp4 into the comment box, wait for the upload, copy
-     the https://github.com/user-attachments/assets/... URL it generates, and paste that URL on its
-     own line here. Close the issue without posting it. -->
+![The camera's view of the plate with the ball tracked in red and the green cross marking the commanded position](docs/media/balancing.gif)
+
+**Holding a target.** What the camera under the plate sees. The ball is outlined in red and the
+**green cross is the commanded position** — the loop keeps the ball on it. Clicking the video in the
+app moves the target.
+
+![The control window during a juggle, with live plots of ball position, tilt and loop rate](docs/media/camera-view.gif)
+
+**Juggling from the camera view.** The same juggle inside the control app, with the live plots
+running: ball position, commanded versus acknowledged tilt, and loop rate.
+
+*Five seconds each, looping. Full-length recordings are kept outside the repository, in
+`my_documents/images/present/`.*
 
 ## Run the demo
 
