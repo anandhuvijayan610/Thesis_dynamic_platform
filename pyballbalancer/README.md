@@ -1,5 +1,10 @@
 # Ball Balancer — PyQt5 control application
 
+*One of the two host applications in this project. See the
+[main README](../README.md) for the machine as a whole, and
+[docs/hardware.md](../docs/hardware.md) / [docs/firmware.md](../docs/firmware.md) for what this
+talks to. The Unity host is separate: **do not copy tuning between them**.*
+
 A replacement for the Unity host application: camera capture, ball detection,
 tilt control, serial link to the microcontroller, and live tuning of every
 parameter without restarting.
@@ -469,6 +474,26 @@ python simtest.py     # closed-loop simulation against a modelled ball and plate
 
 `selftest` and `simtest` need no hardware; `guitest` runs headless. All three
 exit non-zero on failure, so they can be wired into a pre-commit hook.
+
+## Every script, at a glance
+
+The application itself is `main.py` plus the modules listed at the top. Everything else is a tool
+that does one job, run from this folder. The hardware ones need the serial port to themselves, so
+close the GUI first.
+
+| Script | Purpose | Hardware? |
+|---|---|---|
+| `selftest.py` · `machinetest.py` · `modetest.py` · `simtest.py` | Parameters, vision, kinematics, wire format, mode state machine, closed-loop simulation | no |
+| `guitest.py` | Builds the real window offscreen and clicks every button | no |
+| `optics.py` | Camera window and throw physics model (also importable) | no |
+| `hwtest.py` · `workertest.py` | Is the board alive, and does it move? `--move` also moves the plate | yes |
+| `park.py` | Put the plate back on the calibrated level origin | yes |
+| `movetest.py` | Presses the Machine tab's buttons for real | yes |
+| `signtest.py` · `mappingsearch.py` · `pairingtest.py` | Which way the plate pushes the ball; the axis mapping; which arms pair | yes |
+| `autolevel.py` · `centretrim.py` · `backlashtest.py` | Levelling and play, using the ball as the instrument | yes |
+| `exposuretest.py` · `heighttest.py` | Exposure that measures the ball at true size; visibility when raised | yes |
+| `livetest.py` | The oscillation, with the whole GUI alive around it | yes |
+| `unitycheck.py` | Confirms the two hosts agree on **hardware** facts only; reports tuning side by side without judging it | no |
 
 ## Notes on two defaults that are not obvious
 
