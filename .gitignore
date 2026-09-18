@@ -65,3 +65,6 @@ crashlytics-build.properties
 DMPLogsUnity
 my_documents
 my_documents_*
+
+# Personal/unfinished thesis report - keep local only, never publish
+/Thesis Report/
