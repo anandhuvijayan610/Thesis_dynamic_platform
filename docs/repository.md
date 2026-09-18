@@ -17,7 +17,7 @@ Thesis/
 ├── datasheets/                      Teensy, DM542T, NEMA17, buck converters, level shifter
 ├── my_documents/                    Wiring diagrams, photos, screen recordings
 ├── log files/                       Captured Editor/balancing logs and calibration CSV
-├── Thesis Report/                   Thesis document (git submodule pointer — see the housekeeping notes below)
+├── Thesis Report/                   Thesis document — local only, gitignored and not published
 └── campus_cham_leitfaden_abschlussarbeiten_en.pdf   University thesis guidelines
 ```
 
@@ -30,8 +30,9 @@ Thesis/
 - **Unity's `Library/` folder is tracked** and Unity rewrites parts of it, along with some `.mat`
   files, whenever the editor is open. Close Unity before committing to keep that churn out of the
   history.
-- **`Thesis Report/` is a submodule pointer with no `.gitmodules` entry.** It appears empty in a
-  fresh clone; the document lives outside this repository.
+- **`Thesis Report/` is deliberately not in the repository.** It was once committed as a broken
+  gitlink; it is now gitignored, so the unfinished report stays on the local machine and is never
+  published. A fresh clone will not have that folder at all.
 - **Low commit memory breaks Git LFS on Windows.** If `git add` fails with a Go
   `out of memory allocating heap arena map` error, close Unity (or enlarge the page file) and retry.
 - **`.mcp.json`** configures an Overleaf MCP server for editing the thesis. It reads
