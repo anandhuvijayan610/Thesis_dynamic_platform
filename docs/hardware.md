@@ -43,11 +43,11 @@ Common-cathode wiring: `PUL-` and `DIR-` to GND, the `+` inputs driven from the 
 level shifter, `ENA` left unconnected (enabled).
 
 > **Signal levels.** The Teensy is a 3.3 V part and the DM542T inputs are optocouplers specified for
-> 5 V, which is why the TXS0108E sits between them in the schematic above. Note that the TXS0108E is
-> an auto-direction transceiver with weak drive: earlier bring-up on this rig found it could not
-> source what the opto inputs wanted, and the lines were temporarily driven straight from the
-> Teensy at 3.3 V instead. If the drivers ever behave as though they are missing pulses at speed, a
-> stronger 5 V buffer — a 74HCT541, or one NPN transistor per line — is the robust fix.
+> 5 V, so the **TXS0108E is fitted** and carries all eight STEP/DIR lines up to the 5 V rail. During
+> bring-up the lines were driven straight from the Teensy at 3.3 V for a while, which under-drives
+> the optos; the shifter is the finished arrangement. The TXS0108E is an auto-direction transceiver
+> with weak drive, so if the drivers ever behave as though they are missing pulses at speed, a
+> stronger 5 V buffer — a 74HCT541, or one NPN transistor per line — is the fix to reach for.
 
 ### DM542T DIP switches
 
