@@ -24,9 +24,6 @@ app moves the target.
 **Juggling from the camera view.** The same juggle inside the control app, with the live plots
 running: ball position, commanded versus acknowledged tilt, and loop rate.
 
-*Five seconds each, looping. Full-length recordings are kept outside the repository, in
-`my_documents/images/present/`.*
-
 ## Run the demo
 
 You need the machine powered up, the camera plugged in, and the
