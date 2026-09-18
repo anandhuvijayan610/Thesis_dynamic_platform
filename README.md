@@ -13,7 +13,7 @@ open-source [HighPrecisionStepperJuggler](https://github.com/T-Kuhn/HighPrecisio
 |---|---|
 | **[▶ Juggling](docs/media/juggling.mp4)** (14 s) | The machine itself: the plate throws the ball and catches it, cycle after cycle. |
 | **[▶ Holding a target](docs/media/balancing.mp4)** (91 s) | The control app. The ball is tracked in red; the **green cross is the commanded position**, and the loop keeps the ball on it. Click anywhere in the video to move the target. |
-| **[▶ Tuning](docs/media/tuning.mp4)** (25 s) | The same app with the live plots running — ball position, commanded vs acknowledged tilt, and loop rate. |
+| **[▶ Juggling from the camera view](docs/media/tuning.mp4)** (25 s) | The same juggle seen from the camera under the plate, with the live plots running — ball position, commanded vs acknowledged tilt, and loop rate. |
 
 Click a clip to play it on GitHub. These are compressed copies of the originals in
 `my_documents/images/present/` (91 MB → 4 MB), kept small so cloning stays quick.
