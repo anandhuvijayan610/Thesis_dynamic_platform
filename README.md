@@ -86,7 +86,7 @@ Thesis/
 | Microcontroller | Teensy 4.0 |
 | Stepper drivers | 4 × StepperOnline **DM542T** |
 | Motors | 4 × NEMA17 **17HS19-1684S-PG5** — 1.8°/step, **5.18:1** planetary gearbox, 1.68 A/phase |
-| Power | 24 V / 8 A supply; buck converter for the 5 V rail |
+| Power | 36 V / 8 A supply; buck converter for the 5 V rail |
 | Linkage | 4 arms, `L1 = 89 mm`, `L2 = 80 mm`, plate joints 299 mm apart, `Q = 70.023 mm` |
 | Camera | UVC USB camera, 60.41° horizontal FOV, mounted **below** a transparent plate |
 | Ball | 40 mm diameter (radius 20 mm) |
